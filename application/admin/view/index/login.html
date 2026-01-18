@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理-登陆</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="/lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="/css/layuimini.css?v=2.0.4.2" media="all">
+    <link rel="stylesheet" href="/css/themes/default.css" media="all">
+    <link rel="stylesheet" href="/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+        }
+
+        .container {
+            height: 100%;
+            /*background-image: linear-gradient(to right, #108145, #6fa31c); */
+
+            background-image: url(/images/login_bg.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .login-wrapper {
+            background-color: #fff;
+            width: 286px;
+            height: 470px;
+            border-radius: 15px;
+            padding: 0 40px;
+            position: relative;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+        }
+
+        .bott {
+            width: 100%;
+            background-color: #0b430f;
+            position: fixed;
+            top: 97%;
+            height: 30px;
+        }
+
+        .header {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 160px;
+            height: 200px;
+        }
+
+        img {
+            margin-top: 64px;
+            /*width: 60%;*/
+            height: 45%;
+        }
+
+        .input-item {
+            display: block;
+            width: 90%;
+            margin-bottom: 16px;
+            border: 0;
+            color: #000;
+            padding: 10px;
+            border-bottom: 1px solid rgb(0, 0, 0);
+            font-size: 19px;
+            outline: none;
+            font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+        }
+
+            .input-item:placeholder {
+                text-transform: uppercase;
+            }
+
+        .btn {
+            text-align: center;
+            padding: 10px;
+            width: 90%;
+            font-size: 18px;
+            margin-top: 48px;
+            /*background-image: linear-gradient(to right, #80a724, #3d7f90);*/
+            background-color: rgb(29, 68, 35);
+            color: #fff;
+        }
+
+        .msg {
+            text-align: center;
+            line-height: 70px;
+        }
+
+        a {
+            text-decoration-line: none;
+            color: #abc1ee;
+        }
+
+        input::-webkit-input-placeholder {
+            /* WebKit浏览器 */
+            color: #000;
+            /* 设置颜色 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-wrapper">
+            <div class="header">
+                <img src="/images/Logo3.png" alt="" />
+            </div>
+            <div class="form-wrapper">
+                <form class="layui-form login-bottom">
+                    <input type="text" name="username" placeholder="用户名" class="input-item">
+                    <input type="password" name="password" placeholder="密码" class="input-item">
+                    <div class="btn" >
+                        <button class="login-btn" lay-submit="" lay-filter="login" style="text-align: center; width: 100%; height: 100%; margin: 0px; background-color: transparent; border: 0;  color:white;">登&nbsp;&nbsp;&nbsp;录</button>
+                    </div>
+
+                </form>
+            </div>
+            <!--            <div class="msg">
+                出现问题？
+                <a href="#">疑问 -->
+        </div></a>
+ 
+
+    </div>
+
+    <script src="/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+    <script src="/lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script src="/scripts/crypto-js.js"></script>
+    <script>
+        layui.use(['form', 'jquery'], function () {
+            var $ = layui.jquery,
+                form = layui.form,
+                layer = layui.layer;
+
+            // 登录过期的时候，跳出ifram框架
+            if (top.location != self.location) top.location = self.location;
+
+            $('.bind-password').on('click', function () {
+                if ($(this).hasClass('icon-5')) {
+                    $(this).removeClass('icon-5');
+                    $("input[name='password']").attr('type', 'password');
+                } else {
+                    $(this).addClass('icon-5')
+                    $("input[name='password']").attr('type', 'text');
+                }
+            });
+
+            $('.icon-nocheck').on('click', function () {
+                if ($(this).hasClass('icon-check')) {
+                    $(this).removeClass('icon-check');
+                } else {
+                    $(this).addClass('icon-check');
+                }
+            });
+
+        // 进行登录操作
+        form.on('submit(login)', function (data) {
+            data = data.field;
+            var datas = {
+                LoginName: data.username,
+                LoginPass: data.password,
+                RememberMe: data.rememberMe ? "1" : "0",
+                Captcha: data.captcha,
+            };
+            var key = CryptoJS.enc.Utf8.parse('syqtsyqtsyqtsyqt');
+            var iv = CryptoJS.enc.Latin1.parse('syqtsyqtsyqtsyqt');
+            var encryptedData = CryptoJS.AES.encrypt(JSON.stringify(datas), key, {
+                iv: iv,
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            }).toString();
+
+            $.ajax({
+                url: '/{$Request.module}/{$Request.controller}/LoginAsync',
+                type: "post",
+                dataType: "json",
+                async: true,
+                data: {
+                    LoginName:data.username,
+                    LoginPass:data.password,
+                    encryptedData: encryptedData
+                },
+                success: function (data) {
+                    //Info,Success,Warning,Error
+                    var type = data.Type;
+                    if (type == 1) {
+                        window.location.href = '/{$Request.module}/index/index';
+
+                    } else {
+                        layer.msg(data.Content, { icon: 5, time: 2000 });
+                        return false;
+                    }
+                }
+            });
+            return false;
+
+        });
+
+    });
+    </script>
+</body>
+</html>

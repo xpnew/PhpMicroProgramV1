@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>{$title}</legend>
+            </fieldset>
+
+            <form class="layui-form" action="" lay-filter="MainForm">
+                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
+                <input type="hidden" name="ClassTitPic01" id="ClassTitPic01" /><!-- Id主键 -->
+                <input type="hidden" name="EnableBuildBonus" id="EnableBuildBonus" /><!-- Id主键 -->
+                <input type="hidden" name="EnableBuildPoint" id="EnableBuildPoint" /><!-- Id主键 -->
+                <input type="hidden" name="EnablePointBuy" id="EnablePointBuy" /><!-- Id主键 -->
+
+             
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">分类名称</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="ClassName" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">分类排序（增序）</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="SortId" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">允许获取奖励</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="SwitchEnableBuildBonus" lay-skin="switch" lay-filter="SwitchEnableBuildBonus" {if( 1 == $Model.EnableBuildBonus)}  checked {/if} title="是|否">
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">允许积分购买</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="SwitchEnablePointBuy" lay-skin="switch" lay-filter="SwitchEnablePointBuy" {if( 1 == $Model.EnablePointBuy)}  checked {/if} title="是|否">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">允许生成积分</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="SwitchEnableBuildPoint" lay-skin="switch" lay-filter="SwitchEnableBuildPoint" {if( 1 == $Model.EnableBuildPoint)}  checked {/if} title="是|否">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">分区</label>
+                        <div class="layui-input-inline">
+
+                            <select name="ProductZoneId" id="ProductZoneId" lay-verify="required" lay-search>
+                                <option value="">请选择</option>
+
+                                {foreach $ProductZoneDefs as $key=>$vo } 
+                                {if $vo.TypeId == $Model.ProductZoneId }
+                                    <option value="{$vo.TypeId}" selected="selected">{$vo.TypeName}</option>
+                                {else /}     
+                                    <option value="{$vo.TypeId}">{$vo.TypeName}</option>
+                                {/if}     
+                                    
+                                    
+                                {/foreach}
+                                
+                            </select>
+
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="layui-form-item">
+                   
+                    <div class="layui-inline">
+                        <label class="layui-form-label">分类图片（标题图）</label>
+                        <div class="layui-input-inline">
+                           <button type="button" class="layui-btn" id="ID-upload-demo-btn">
+                            <i class="layui-icon layui-icon-upload"></i> 单图片上传
+                            </button>
+                            <div style="width: 132px;">
+                                <div class="layui-upload-list">
+                                    <img class="layui-upload-img" id="ID-upload-demo-img" style="width: 100%; height: 92px;" src="{$Model->ClassTitPic01|default=''}">
+                                    <div id="ID-upload-demo-text"></div>
+                                </div>
+                                <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="filter-demo">
+                                    <div class="layui-progress-bar" lay-percent=""></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+    </div>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+
+
+
+              // 单图片上传
+  var uploadInst = upload.render({
+    elem: '#ID-upload-demo-btn',
+    url: '/{$Request.module}/Upload/save', // 实际使用时改成您自己的上传接口即可。
+    data: {'ClientWorkName':'{$Request.module}/{$Request.controller}','ClientTypeId':'60001000',ClientTypeName:'商品分类标题图',Remark:'商品分类 标题图片01'},
+    before: function(obj){
+      // 预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#ID-upload-demo-img').attr('src', result); // 图片链接（base64）
+      });
+      
+      element.progress('filter-demo', '0%'); // 进度条复位
+      layer.msg('上传中', {icon: 16, time: 0});
+    },
+    done: function(res){
+        Debug('upload  res :',res);
+      // 若上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      // 上传成功的一些操作
+      // …
+      $('#ClassTitPic01').val(res.DataInfo.VisualPath); 
+
+      $('#ID-upload-demo-text').html(''); // 置空上传失败的状态
+    },
+    error: function(ex){
+        Debug('upload  error :', ex);
+      // 演示失败状态，并实现重传
+      var demoText = $('#ID-upload-demo-text');
+      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+      demoText.find('.demo-reload').on('click', function(){
+        uploadInst.upload();
+      });
+    },
+    // 进度条
+    progress: function(n, elem, e){
+      element.progress('filter-demo', n + '%'); // 可配合 layui 进度条元素使用
+      if(n == 100){
+        layer.msg('上传完毕', {icon: 1});
+      }
+    }
+  });
+
+        // 指定开关事件
+        form.on('switch(SwitchEnableBuildBonus)', function(data){
+            layer.msg('开关 SwitchEnableBuildBonus '+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            $('#EnableBuildBonus').val(this.checked ? '1' : '0');
+            layer.tips(' 允许获取奖励 温馨提示, 新值 ：' + $('#EnableBuildBonus').val(), data.othis)
+            // layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是 ON|OFF', data.othis)
+        });
+        form.on('switch(SwitchEnablePointBuy)', function(data){
+
+            $('#EnablePointBuy').val(this.checked ? '1' : '0');
+            layer.tips(' 允许积分购买 温馨提示, 新值 ：' + $('#EnablePointBuy').val(), data.othis)
+        });
+        form.on('switch(SwitchEnableBuildPoint)', function(data){
+
+            $('#EnableBuildPoint').val(this.checked ? '1' : '0');
+            layer.tips(' 允许生成积分 温馨提示, 新值 ：' + $('#EnableBuildPoint').val(), data.othis)
+        });
+
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            console.log(data);
+            Debug(data);
+            // if (CheckNull(data.field.EmployeeTypeId)) {
+            //     layer.alert('请选择 职员类型', { icon: 5 });
+            //     return false;
+            // }
+
+            // if (null != data) return false;
+
+            $.ajax({
+                url: '/{$Request.module}/{$Request.controller}/save',
+                type: 'post',
+                dataType: 'json',
+                data: data.field,
+                success: function (data) {
+                    console.log(data);
+                    //Info,Success,Warning,Error
+                    var type = data.Type;
+                    if (0 < data.StatusCode) {
+                        layer.msg(data.Title, { icon: 6, time: 2000 },
+                            function () {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+
+                                if (parent.ReloadList)
+                                    parent.ReloadList();
+                                if (parent.layer.RefreshTable)
+                                    parent.layer.RefreshTable();
+                            });
+
+                    } else {
+                        layer.alert(data.Title, { icon: 5 });
+                    }
+                }
+            });
+            //layer.alert(JSON.stringify(data.field), {
+            //    title: '最终的提交信息'
+            //})
+            return false;
+        });
+
+
+        //表单初始赋值
+        form.val('MainForm', {
+
+            "Id": "{$Model->Id}" //Id主键
+            , "ClassName": "{$Model->ClassName}" //登录账号
+            , "SortId": "{$Model->SortId|default='1000'}" //
+            , "EnableBuildBonus": "{$Model->EnableBuildBonus|default='0'}" //
+            , "EnablePointBuy": "{$Model->EnablePointBuy|default='0'}" //
+            , "EnableBuildPoint": "{$Model->EnableBuildPoint|default='0'}" //
+            , "ClassTitPic01": "{isset($Model->ClassTitPic01)?$Model->ClassTitPic01:''}" //登录账号
+
+        })
+
+
+
+
+
+
+
+        });
+
+
+
+    </script>
+</body>
+</html>

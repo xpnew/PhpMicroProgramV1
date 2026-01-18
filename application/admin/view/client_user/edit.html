@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+<div class="layui-tabs layui-tabs-card " id="PageHeadTab">
+  <ul class="layui-tabs-header layui-bg-tint" >
+    <li class="layui-this" lay-id="BaseInfo">基本信息</li>
+    <li lay-id="PayBillList">消费记录</li>
+    <li lay-id="PointLogList">积分变动记录</li>
+    <li lay-id="BonusLogList">奖金变动记录</li>
+    <li lay-id="WithdrawList">提现申请记录</li>
+
+  </ul>
+  <div class="layui-tabs-body">
+    <div class="layui-tabs-item layui-show">
+            <form class="layui-form" action="" lay-filter="MainForm">
+<input type="hidden" name="Id" id="Id" value="" /><!-- 主键  -->
+
+
+<input type="hidden" name="OpenId" id="OpenId" value="" /><!-- 微信OpenId  -->
+<input type="hidden" name="TokenId" id="TokenId" value="" /><!-- TokenId  -->
+<input type="hidden" name="Mobile" id="Mobile" value="" /><!-- 手机号  -->
+<input type="hidden" name="RealityName" id="RealityName" value="" /><!-- 实名  -->
+<input type="hidden" name="Account" id="Account" value="" /><!-- 账号  -->
+<input type="hidden" name="Password" id="Password" value="" /><!-- 密码  -->
+<input type="hidden" name="NickName" id="NickName" value="" /><!-- 呢称  -->
+<input type="hidden" name="IsBindPhone" id="IsBindPhone" value="" /><!-- 已经绑定手机  -->
+<input type="hidden" name="IsReality" id="IsReality" value="" /><!-- 是否已经实名  -->
+<input type="hidden" name="StoreId" id="StoreId" value="" /><!-- 商户Id 本项目未使用  -->
+<input type="hidden" name="LockState" id="LockState" value="" /><!-- 用来和其它Web通信的接口  -->
+<input type="hidden" name="RegPlatform" id="RegPlatform" value="" /><!-- 注册平台  -->
+<input type="hidden" name="RegisterIp" id="RegisterIp" value="" /><!-- 注册IP  -->
+<input type="hidden" name="RegisterDate" id="RegisterDate" value="" /><!-- 注册日期  -->
+<input type="hidden" name="LoginDate" id="LoginDate" value="" /><!-- 登录日期  -->
+<input type="hidden" name="LogoutDate" id="LogoutDate" value="" /><!-- 登出日期  -->
+<input type="hidden" name="LoginIp" id="LoginIp" value="" /><!-- 登录IP  -->
+<input type="hidden" name="UserLevel" id="UserLevel" value="" /><!-- 用户等级  -->
+<input type="hidden" name="AdminLevel" id="AdminLevel" value="" /><!-- 用户对应的后台管理等级   -->
+<input type="hidden" name="VipLevel" id="VipLevel" value="" /><!-- VIP等级  -->
+<input type="hidden" name="VipExp" id="VipExp" value="" /><!-- VIP经验  -->
+<input type="hidden" name="Sex" id="Sex" value="" /><!-- 性别 1 男 2 女 3 其它  -->
+<input type="hidden" name="Remarks" id="Remarks" value="" /><!-- 备注  -->
+<input type="hidden" name="RegisterTerminal" id="RegisterTerminal" value="" /><!-- 注册终端  -->
+<input type="hidden" name="GId" id="GId" value="" /><!-- Guid  -->
+<input type="hidden" name="OldLoginIp" id="OldLoginIp" value="" /><!-- 上一次登录的Ip  -->
+<input type="hidden" name="FaceImg" id="FaceImg" value="" /><!-- 头像  -->
+<input type="hidden" name="RegArea" id="RegArea" value="" /><!-- 注册区域（邮编区号）  -->
+<input type="hidden" name="RegAreaName" id="RegAreaName" value="" /><!-- 注册区域名称  -->
+<input type="hidden" name="UserRegSource" id="UserRegSource" value="" /><!-- 注册来源  -->
+<input type="hidden" name="Address" id="Address" value="" /><!-- 地址  -->
+<input type="hidden" name="IDCard" id="IDCard" value="" /><!-- 身份证  -->
+<input type="hidden" name="BirthDay" id="BirthDay" value="" /><!-- 生日  -->
+<input type="hidden" name="IsPromete" id="IsPromete" value="" /><!-- 已经提权  -->
+<input type="hidden" name="CreateTime" id="CreateTime" value="" /><!-- 创建日期  -->
+<input type="hidden" name="FirstLoginTime" id="FirstLoginTime" value="" /><!-- 首次登录日期  -->
+<input type="hidden" name="IsDelFlag" id="IsDelFlag" value="" /><!-- 删除标记  -->
+<input type="hidden" name="DelTime" id="DelTime" value="" /><!-- 删除日期  -->
+<input type="hidden" name="LoginClientID" id="LoginClientID" value="" /><!-- 登录的客户端ID  -->
+<input type="hidden" name="LoginPlatform" id="LoginPlatform" value="" /><!-- 登录平台  -->
+<input type="hidden" name="LoginVersion" id="LoginVersion" value="" /><!-- 登录版本  -->
+<input type="hidden" name="SignoutStatus" id="SignoutStatus" value="" /><!-- 注销状态  0 未注销 1 已经注销  -->
+<input type="hidden" name="SignoutTime" id="SignoutTime" value="" /><!-- 注销日期  -->
+<input type="hidden" name="GuiderBonus" id="GuiderBonus" value="" /><!-- 直推奖  -->
+<input type="hidden" name="ManageBonus" id="ManageBonus" value="" /><!-- 管理奖  -->
+<input type="hidden" name="PersonalPerformance" id="PersonalPerformance" value="" /><!-- 个人业绩  -->
+<input type="hidden" name="GuiderPerformance" id="GuiderPerformance" value="" /><!-- 直推业绩  -->
+<input type="hidden" name="MakerLevel" id="MakerLevel" value="" /><!-- 创客等级  -->
+<input type="hidden" name="ShareholderLevel" id="ShareholderLevel" value="" /><!-- 股东等级  -->
+<input type="hidden" name="BuyTimes" id="BuyTimes" value="" /><!-- 购买次数  -->
+<input type="hidden" name="HisMonetary" id="HisMonetary" value="" /><!-- 消费金额  -->
+<input type="hidden" name="BalacePoints" id="BalacePoints" value="" /><!-- 剩余积分  -->
+<input type="hidden" name="HisPoints" id="HisPoints" value="" /><!-- 历史积分  -->
+
+
+             
+<input type="hidden" name="GuiderUserId_Old" id="GuiderUserId_Old" value="{$Model.GuiderUserId}" /><!-- 推荐人UserId  -->
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">UserId/推荐码</label>
+                        <div class="layui-input-inline  layui-text-form" >
+                            {$Model.Id}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">推荐人Id</label>
+                        <div class="layui-input-inline layui-text layui-text-form layui-input-group" id="div_GuiderUserId">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-user"></i>
+                            </div>                        
+                            <input type="text" readonly id="GuiderUserId" lay-on="GuiderUserSelector" class="layui-input"  name="GuiderUserId" value="{$Model.GuiderUserId}" />
+                            <div class="layui-input-suffix btn-selector-open">
+                                <button type="button"  class="layui-btn layui-btn-primary  bt4selector" lay-on="GuiderUserSelector" >                                    
+                                    <i class="layui-icon"></i>                                    
+                                </button>
+                            </div>                            
+                        </div>
+                        
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">推荐人</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" readonly id="GuiderUserName" lay-on="GuiderUserSelector" class="layui-input"  name="GuiderUserName" value="" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">推荐人手机号</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" readonly id="GuiderUserMobile" lay-on="GuiderUserSelector" class="layui-input"  name="GuiderUserMobile" value="" />
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">呢称</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.NickName}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">手机</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" name="Mobile" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">实名</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            {$Model.RealityName}
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="layui-form-item">                  
+                    <div class="layui-inline">
+                        <label class="layui-form-label">奖金(历史/剩余/冻结)</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.BonusHistory}/  {$Model.BonusBalance}/  {$Model.BonusFrozen}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">金果(历史/剩余/冻结)</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.ScoreHistory}/  {$Model.ScoreBalance}/  {$Model.ScoreFrozen}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">积分(历史/剩余/冻结)</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.PointsHistory}/  {$Model.PointsBalance}/  {$Model.PointsFrozen}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-form-item">                  
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">购买次数</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.BuyTimes}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">消费金额</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.HisMonetary}
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="MakerLevelId" id="MakerLevelId" value="" /><!-- 创客等级  -->
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">创客等级</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                        {foreach $MakeingLvList as $key=>$vo }
+                            {if $vo.Id == $Model.MakerLevelId }
+                                 {$vo.LevelName}
+                            {/if}                           
+                        {/foreach}                                
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">注册日期：</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.RegisterDate}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">登录日期</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.LoginDate}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">冻结状态</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            <input type="checkbox" name="SwitchIsDelFlag" lay-skin="switch" lay-filter="SwitchIsDelFlag" {if( 1 == $Model.IsDelFlag)}  checked {/if} title="是|否">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">冻结日期</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.DelTime}
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="MainForm">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+        <div id="btm-bts"  class="layui-btn-container">
+            <button type="button" class="layui-btn layui-bg-purple" onclick="OptLevel()">会员升级</button> 
+            <button type="button" class="layui-btn layui-bg-purple" onclick="OptPoints()">操作积分</button> 
+            <button type="button" class="layui-btn layui-bg-purple" onclick="OptBouns(80001000)">操作奖金</button> 
+            <button type="button" class="layui-btn layui-bg-purple" onclick="OptBouns(80002000);">操作金果</button> 
+
+        </div>
+
+				<script type="text/html" id="toolbarDemo">
+
+
+
+
+				</script>
+
+
+    </div><!-- tab1 end -->
+    <div class="layui-tabs-item">
+        <table class="layui-hide" id="PayBillList" lay-filter="PayBillList"></table>
+    </div><!-- tab2 end -->
+    <div class="layui-tabs-item">
+        <table class="layui-hide" id="PointLogList" lay-filter="PointLogList"></table>
+    </div><!-- tab3 end -->
+    <div class="layui-tabs-item">
+        <table class="layui-hide" id="BonusLogList" lay-filter="BonusLogList"></table>
+        
+    </div><!-- tab4 end -->
+    <div class="layui-tabs-item">
+        <table class="layui-hide" id="WithdrawList" lay-filter="WithdrawList"></table>
+    </div><!-- tab5 end -->
+
+  </div>
+
+
+
+</div>            
+
+
+
+    </div>
+    </div>
+
+<div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>添加新员工</h2>
+                <button class="close-btn" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="inpdi">
+                    <label for="name">姓名:</label>
+                    <input type="text" class="empnameinp" id="name" placeholder="请输入员工姓名">
+                </div>
+                <div class="inpdi">
+                    <label for="gender">性别:</label>
+                    <select class="selec" id="gender">
+                        <option>男</option>
+                        <option>女</option>
+                    </select>
+                </div>
+                <div class="inpdi">
+                    <label for="position">职位:</label>
+                    <input type="text" class="empnameinp" id="position" placeholder="请输入职位名称">
+                </div>
+                <div class="inpdi">
+                    <label for="company">所属公司:</label>
+                    <input type="text" class="empnameinp" id="position" placeholder="请输入所属公司">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-tertiary">
+                    <i class="fas fa-times-circle"></i> 取消
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-check-circle"></i> 确认添加
+                </button>
+            </div>
+        </div>
+    </div>
+</div> <!-- modal-overlay end -->   
+
+<div id="ID-test-layer-wrapper" style="display: none;">
+  <div style="padding:16px;">
+    弹出已经存在于页面中的一段元素<br>
+    通常是放置在 &lt;body&gt; 根节点下
+  </div>
+</div> <!-- 弹出层 demo end  -->
+
+<div id="OptLevel" style="display: none;"> 
+    <form class="layui-form level3-form" action="" id="OptLevelForm" lay-filter="OptLevelForm">
+
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">创客等级</label>
+                <div class="layui-input-inline layui-text layui-text-form">
+                
+                    <select name="MakerLevelId" id="OptLevel_MakerLevelId" lay-verify="required" lay-search>
+                        <option value="">请选择</option>
+
+                        {foreach $MakeingLvList as $key=>$vo } 
+                        {if $vo.Id == $Model.MakerLevelId }
+                            <option value="{$vo.Id}" selected="selected">{$vo.LevelName}</option>
+                        {else /}     
+                            <option value="{$vo.Id}">{$vo.LevelName}</option>
+                        {/if}     
+                            
+                            
+                        {/foreach}
+                        
+                    </select>
+                </div>
+            </div>
+        </div>  
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" name="Rmk" class="layui-textarea"></textarea>
+            </div>
+        </div>        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="OptLevelForm-submit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>      
+        </div>
+    </form>
+
+</div> <!-- SetPoints end -->
+
+<div id="SetPoints" style="display: none;"> 
+    <form class="layui-form level3-form" action="" id="OptPointsForm" lay-filter="OptPointsForm">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">注意：</label>
+                <div class="layui-input-inline layui-text layui-text-form">
+                    本操作可以控制客户积分的增加、扣除
+                </div>
+            </div>
+        </div>     
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">可操作积分</label>
+                <div class="layui-input-inline layui-text layui-text-form">
+                     {$Model.PointsBalance}
+                </div>
+            </div>
+        </div> 
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">变动方式</label>
+                <div class="layui-input-inline  layui-text-form">
+                    <input type="radio" name="ChangeType"  value="1" title="增加">
+                    <div lay-radio>
+                        <span style="color: rgb(15, 227, 132);"><i class="layui-icon">&#xe61f;</i> 增加</span>
+                    </div>
+                    <input type="radio" name="ChangeType" value="-1" title="扣除">
+                    <div lay-radio>
+                        <span style="color: rgb(240, 11, 49);"><i class="layui-icon">&#xe616;</i> 扣除</span>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">积分：</label>
+                <div class="layui-input-inline layui-text-form">
+                    <input type="text" name="Points" id="Points" lay-verify="required" placeholder="请输入积分" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>  
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" name="Rmk" class="layui-textarea"></textarea>
+            </div>
+        </div>        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="OptPointsForm-submit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>      
+        </div>
+    </form>
+
+</div> <!-- SetPoints end -->
+<div id="SetBouns" style="display: none;"> 
+    <form class="layui-form level3-form" action="" id="OptPointsForm" lay-filter="OptBounsForm">
+        <input  type="hidden" id="OptBounsAssetType" name="OptBounsAssetType" value="">
+        <div class="layui-form-item OptBouns_Type" id="OptBouns_80001000">
+            <div class="layui-inline">
+                <label class="layui-form-label">奖金余额</label>
+                <div class="layui-input-inline layui-text layui-text-form">
+                     {$Model.BonusBalance}
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item OptBouns_Type" id="OptBouns_80002000">
+            <div class="layui-inline">
+                <label class="layui-form-label">金果余额</label>
+                <div class="layui-input-inline layui-text layui-text-form">
+                     {$Model.ScoreBalance}
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">资产类型</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="OptBounsAssetTypeName" id="OptBounsAssetTypeName" lay-verify="required" placeholder="请输入资产类型" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">变动方式</label>
+                <div class="layui-input-inline  layui-text-form">
+                    <input type="radio" name="ChangeType"  value="1" title="增加">
+                    <div lay-radio>
+                        <span style="color: rgb(15, 227, 132);"><i class="layui-icon">&#xe61f;</i> 增加</span>
+                    </div>
+                    <input type="radio" name="ChangeType" value="-1" title="扣除">
+                    <div lay-radio>
+                        <span style="color: rgb(240, 11, 49);"><i class="layui-icon">&#xe616;</i> 扣除</span>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">数额：</label>
+                <div class="layui-input-inline layui-text-form">
+                    <input type="text" name="Bonus" id="Bonus" lay-verify="required" placeholder="请输入数额" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>  
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" name="Rmk" class="layui-textarea"></textarea>
+            </div>
+        </div>        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="OptBounsForm-submit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>      
+        </div>
+    </form>
+
+</div> <!-- SetBouns end -->
+
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+            // 自定义验证规则
+            form.verify({
+                // 确认密码
+                confirmPassword: function (value, item) {
+                    var passwordValue = $('#RegPwd').val();
+                    if (value !== passwordValue) {
+                        return '两次密码输入不一致';
+                    }
+                }
+
+            });
+
+        // 指定开关事件
+        form.on('switch(SwitchIsDelFlag)', function(data){
+            $('#IsDelFlag').val(this.checked ? '1' : '0');
+            layer.tips('  冻结状态切换 温馨提示, 新值 ：' + $('#IsDelFlag').val(), data.othis)
+            // layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是 ON|OFF', data.othis)
+        });
+
+
+
+              // 单图片上传
+  var uploadInst = upload.render({
+    elem: '#ID-upload-demo-btn',
+    url: '/{$Request.module}/Upload/save', // 实际使用时改成您自己的上传接口即可。
+    data: {'ClientWorkName':'admin/ProductClass','ClientTypeId':'1',ClientTypeName:'分类标题图',Remark:'产品分类 标题图片01'},
+    before: function(obj){
+      // 预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#ID-upload-demo-img').attr('src', result); // 图片链接（base64）
+      });
+      
+      element.progress('filter-demo', '0%'); // 进度条复位
+      layer.msg('上传中', {icon: 16, time: 0});
+    },
+    done: function(res){
+        Debug('upload  res :',res);
+      // 若上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      // 上传成功的一些操作
+      // …
+      $('#ProductPic').val(res.DataInfo.VisualPath); 
+
+      Debug('upload  VisualPath :', res.DataInfo.VisualPath);
+      Debug('ProductPic val: ', $('#ProductPic').val());
+
+      $('#ID-upload-demo-text').html(''); // 置空上传失败的状态
+    },
+    error: function(ex){
+        Debug('upload  error :', ex);
+      // 演示失败状态，并实现重传
+      var demoText = $('#ID-upload-demo-text');
+      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+      demoText.find('.demo-reload').on('click', function(){
+        uploadInst.upload();
+      });
+    },
+    // 进度条
+    progress: function(n, elem, e){
+      element.progress('filter-demo', n + '%'); // 可配合 layui 进度条元素使用
+      if(n == 100){
+        layer.msg('上传完毕', {icon: 1});
+      }
+    }
+  });
+
+
+            //监听提交
+            form.on('submit(MainForm)', function (data) {
+                console.log(data);
+                Debug(data);
+                // if (CheckNull(data.field.EmployeeTypeId)) {
+                //     layer.alert('请选择 职员类型', { icon: 5 });
+                //     return false;
+                // }
+
+                //if (null != data) return false;
+
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/save',
+                    type: 'post',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+
+                                    if (parent.ReloadList)
+                                        parent.ReloadList();
+                                    if (parent.layer.RefreshTable)
+                                        parent.layer.RefreshTable();
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
+            });
+
+
+            //监听提交
+            form.on('submit(OptLevelForm-submit)', function (data) {
+                console.log(data);
+                Debug(data);
+                if (CheckNull(data.field.MakerLevelId)) {
+                    layer.alert('必须指定 【变动方式】 ', { icon: 5 });
+                    return false;
+                }
+                // console.log('data.field', JSON.stringify(data.field));                   
+                // let PostData = data.field;
+                // PostData.ClientUserId = $('#Id').val();
+                let PostData = {...data.field, ClientUserId: $('#Id').val()};
+                // console.log('data.field', JSON.stringify(data.field));                
+
+                // console.log('data.field',data.field);                
+                console.log('PostData',PostData);
+                // if (null != data) return false;
+//                 在JS当中，下面这行代出错了， 是因为 data.field 是一个对象，不能用 ...data.field吗？
+
+// let PostData =[... data.field ]; 
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/OptLevel',
+                    type: 'post',
+                    dataType: 'json',
+                    data: PostData,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                  layer.closeLast('page'); // 关闭最近一次打开的页面层
+
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
+            });
+
+            //监听提交
+            form.on('submit(OptPointsForm-submit)', function (data) {
+                console.log(data);
+                Debug(data);
+                if (CheckNull(data.field.ChangeType)) {
+                    layer.alert('必须指定 【变动方式】 ', { icon: 5 });
+                    return false;
+                }
+                // console.log('data.field', JSON.stringify(data.field));                   
+                // let PostData = data.field;
+                // PostData.ClientUserId = $('#Id').val();
+                let PostData = {...data.field, ClientUserId: $('#Id').val()};
+                // console.log('data.field', JSON.stringify(data.field));                
+
+                // console.log('data.field',data.field);                
+                console.log('PostData',PostData);
+                // if (null != data) return false;
+//                 在JS当中，下面这行代出错了， 是因为 data.field 是一个对象，不能用 ...data.field吗？
+
+// let PostData =[... data.field ]; 
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/OptPoints',
+                    type: 'post',
+                    dataType: 'json',
+                    data: PostData,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                  layer.closeLast('page'); // 关闭最近一次打开的页面层
+
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
+            });
+
+
+            //监听提交
+            form.on('submit(OptBounsForm-submit)', function (data) {
+                if (CheckNull(data.field.ChangeType)) {
+                    layer.alert('必须指定 【变动方式】 ', { icon: 5 });
+                    return false;
+                }
+                // console.log('data.field', JSON.stringify(data.field));          
+                let PostData = {...data.field, ClientUserId: $('#Id').val()};
+                PostData.AssetTypeId = PostData.OptBounsAssetType;
+                // console.log('data.field',data.field);                
+                console.log('PostData',PostData);
+                // if (null != data) return false;
+
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/OptBonus',
+                    type: 'post',
+                    dataType: 'json',
+                    data: PostData,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                  layer.closeLast('page'); // 关闭最近一次打开的页面层
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                return false;
+            });
+
+
+            util.on('lay-on', {
+                'GuiderUserSelector': function () {
+                    var Path = "/{$Request.module}/Selector/Client";
+                    Path += '?_dx=' + Math.random();
+                    layer.open({
+                        type: 2,
+                        area: ['90%', '90%'],
+                        title: false, // 不显示标题栏
+                        closeBtn: 0,
+                        shadeClose: true, // 点击遮罩关闭层
+                        content: Path,
+                        end: function () {
+                            // layer.msg('关闭后的回调', {icon:6});
+                        }
+                    });
+                }
+
+            });
+
+
+
+
+                        //表单初始赋值
+            form.val('MainForm', {
+
+                "Id": "{$Model->Id}" //Id主键
+
+, "OpenId": "{$Model->OpenId|default=''}" // 微信OpenId
+, "TokenId": "{$Model->TokenId|default=''}" // TokenId
+, "Mobile": "{$Model->Mobile|default=''}" // 手机号
+, "RealityName": "{$Model->RealityName|default=''}" // 实名
+, "GuiderUserId": "{$Model->GuiderUserId|default=''}" // 推荐人UserId
+, "Account": "{$Model->Account|default=''}" // 账号
+, "Password": "{$Model->Password|default=''}" // 密码
+, "NickName": "{$Model->NickName|default=''}" // 呢称
+, "IsBindPhone": "{$Model->IsBindPhone|default=''}" // 已经绑定手机
+, "IsReality": "{$Model->IsReality|default=''}" // 是否已经实名
+, "StoreId": "{$Model->StoreId|default=''}" // 商户Id 本项目未使用
+, "LockState": "{$Model->LockState|default=''}" // 用来和其它Web通信的接口
+, "RegPlatform": "{$Model->RegPlatform|default=''}" // 注册平台
+, "RegisterIp": "{$Model->RegisterIp|default=''}" // 注册IP
+, "RegisterDate": "{$Model->RegisterDate|default=''}" // 注册日期
+, "LoginDate": "{$Model->LoginDate|default=''}" // 登录日期
+, "LogoutDate": "{$Model->LogoutDate|default=''}" // 登出日期
+, "LoginIp": "{$Model->LoginIp|default=''}" // 登录IP
+, "UserLevel": "{$Model->UserLevel|default=''}" // 用户等级
+, "VipLevel": "{$Model->VipLevel|default=''}" // VIP等级
+, "VipExp": "{$Model->VipExp|default=''}" // VIP经验
+, "Sex": "{$Model->Sex|default=''}" // 性别 1 男 2 女 3 其它
+, "Remarks": "{$Model->Remarks|default=''}" // 备注
+, "RegisterTerminal": "{$Model->RegisterTerminal|default=''}" // 注册终端
+, "GId": "{$Model->GId|default=''}" // Guid
+, "OldLoginIp": "{$Model->OldLoginIp|default=''}" // 上一次登录的Ip
+, "FaceImg": "{$Model->FaceImg|default=''}" // 头像
+, "RegArea": "{$Model->RegArea|default=''}" // 注册区域（邮编区号）
+, "RegAreaName": "{$Model->RegAreaName|default=''}" // 注册区域名称
+, "UserRegSource": "{$Model->UserRegSource|default=''}" // 注册来源
+, "Address": "{$Model->Address|default=''}" // 地址
+, "IDCard": "{$Model->IDCard|default=''}" // 身份证
+, "BirthDay": "{$Model->BirthDay|default=''}" // 生日
+, "IsPromete": "{$Model->IsPromete|default=''}" // 已经提权
+, "CreateTime": "{$Model->CreateTime|default=''}" // 创建日期
+, "FirstLoginTime": "{$Model->FirstLoginTime|default=''}" // 首次登录日期
+, "IsDelFlag": "{$Model->IsDelFlag|default=''}" // 删除标记
+, "DelTime": "{$Model->DelTime|default=''}" // 删除日期
+, "LoginClientID": "{$Model->LoginClientID|default=''}" // 登录的客户端ID
+, "LoginPlatform": "{$Model->LoginPlatform|default=''}" // 登录平台
+, "LoginVersion": "{$Model->LoginVersion|default=''}" // 登录版本
+, "SignoutStatus": "{$Model->SignoutStatus|default=''}" // 注销状态  0 未注销 1 已经注销
+, "SignoutTime": "{$Model->SignoutTime|default=''}" // 注销日期 
+, "MakerLevelId": "{$Model->MakerLevelId|default=''}" // 创客等级
+, "ShareholderLevel": "{$Model->ShareholderLevel|default=''}" // 股东等级
+, "BuyTimes": "{$Model->BuyTimes|default=''}" // 购买次数
+, "HisMonetary": "{$Model->HisMonetary|default=''}" // 消费金额
+, "PointsHistory": "{$Model->PointsHistory|default=''}" // 历史积分
+, "PointsBalance": "{$Model->PointsBalance|default=''}" // 剩余积分
+, "PointsFrozen": "{$Model->PointsFrozen|default=''}" // 冻结积分
+, "BounsHistory": "{$Model->BounsHistory|default=''}" // 奖金历史
+, "BounsBalance": "{$Model->BounsBalance|default=''}" // 奖金余额
+, "BounsFrozen": "{$Model->BounsFrozen|default=''}" // 奖金冻结数额
+, "IsRegionAgent": "{$Model->IsRegionAgent|default=''}" // 是否为区县代理
+
+
+            })
+
+
+
+
+
+
+
+        });
+
+        function SetClientUserJson(jsonObj) {
+            if (CheckNull(jsonObj)) return;
+
+            var formdata = layui.form.val('MainForm');
+            Debug('formdata', formdata);
+            Debug('jsonObj', jsonObj);
+            layui.form.val('MainForm', {
+                "GuiderUserId": jsonObj.GuiderUserId,
+                "GuiderUserName": jsonObj.RealityName + ' (' + jsonObj.NickName + ')',
+                "GuiderUserMobile": jsonObj.Mobile,
+
+            });
+            //$('#SupplierName').val(jsonObj.SupplierName)
+            //layui.form.render($('#SupplierName')); // 仅渲染 id="select-id" 的表单项
+            //layui.form.render($('#MainForm')); // 仅渲染 id="select-id" 的表单项
+
+            Debug('formdata', formdata);
+
+
+        }
+        $(document).ready(function() {
+            console.log('页面加载完成');
+            Debug('原来的推荐人Id： ' + $('#GuiderUserId_Old').val());
+
+            if ($('#GuiderUserId_Old').val() != '') {
+                // 获取推荐人信息
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/read',
+                    type: 'GET',
+                    data: { id: $('#GuiderUserId_Old').val() },
+                    success: function(data) {
+                        if (0 < data.StatusCode) {
+                            Debug('获取推荐人信息成功', data.DataInfo);
+                            var guider = data.DataInfo;
+                            guider.GuiderUserId = $('#GuiderUserId_Old').val();
+                            SetClientUserJson(guider);
+                        } else {
+                            layer.alert('获取推荐人信息失败：' + data.Title, { icon: 5 });
+                        }
+                    }
+                })
+            }            
+            // 在这里执行其他操作
+        });
+    </script>
+    <script type="text/javascript">
+
+        var OrderStatusArr = [];
+
+        var PayStatusArr = [];
+        var AssetModeArr = [];
+
+        $(function () {
+            Debug('OrderStatusArr', OrderStatusArr);
+            FillTypeDefArr(8000, OrderStatusArr);
+            FillTypeDefArr(8100, PayStatusArr);
+            FillTypeDefArr(9000, AssetModeArr);
+
+        });
+        
+        function DisplayOrderStatus(id, defname = '') {
+            return GetName4TypeId(OrderStatusArr, id, defname);
+        }
+        function DisplayPayStatus(id, defname = '') {
+            return GetName4TypeId(PayStatusArr, id, defname);
+        }
+        function DisplayAssetMode(id, defname = '') {
+            return GetName4TypeId(AssetModeArr, id, defname);
+        }
+
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const closeModal = document.getElementById('closeModal');
+
+    function OptLevel(){
+
+      layer.open({
+        type: 1,
+        shade: 0.3, // 不显示遮罩
+        scrollbar: false,
+        shadeClose: true,
+        maxmin: true,
+        area: ['90%', '90%'],
+        title: '会员升级',
+        content: $('#OptLevel'), // 捕获的元素
+        end: function(){
+            
+        }
+      });        
+       layui.form.render($('#OptLevel_MakerLevelId')); 
+    }
+    function OptPoints(){
+        // $('#modalOverlay').show();
+        //  $('#modalOverlay').addClass('active');
+        // Debug('#modalOverlay ', $('#modalOverlay').length);
+        // Debug('#modalOverlay ', $('#modalOverlay'));
+        // const modalOverlay = document.getElementById('modalOverlay');
+        // Debug('modalOverlay : ', modalOverlay);
+      layer.open({
+        type: 1,
+        shade: 0.3, // 不显示遮罩
+        scrollbar: false,
+        shadeClose: true,
+        maxmin: true,
+        area: ['90%', '90%'],
+        title: '积分操作',
+        content: $('#SetPoints'), // 捕获的元素
+        end: function(){
+          // layer.msg('关闭后的回调', {icon:6});
+        }
+      });       
+
+        // modalOverlay.classList.add('active');
+        // document.body.style.overflow = 'hidden'; // 防止背景滚动
+    }
+    function OptBouns(asssetType = 80001000){
+        $('#OptBounsAssetType').val(asssetType);
+        var AssetTypeName = DisplayOrderStatus(asssetType);
+        Debug('AssetTypeName : ', AssetTypeName);
+        Debug('asssetType : ', asssetType);
+        Debug('asssOptBounsAssetTypeetType : ',  $('#OptBounsAssetType').val());
+        $('#OptBounsAssetTypeName').val(AssetTypeName);
+        $('#OptBounsAssetTypeName').attr('disabled', true);
+        $('#OptBounsAssetTypeName').attr('readonly', true);
+        $('.OptBouns_Type').hide();
+        $('#OptBouns_' + asssetType).show();
+        layer.open({
+            type: 1,
+            shade: 0.3, // 不显示遮罩
+            scrollbar: false,
+            shadeClose: true,
+            maxmin: true,
+            area: ['90%', '90%'],
+            title: '操作' +AssetTypeName,
+            content: $('#SetBouns'), // 捕获的元素
+            end: function(){
+            // layer.msg('关闭后的回调', {icon:6});
+            }
+        });    
+    }
+
+
+    // 按ESC键关闭模态框
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+    </script>
+
+<script>
+    var LoadedTabs = [false, false, false,false,false];
+    var TabsFlagMap = new Map(
+        [
+            ['BaseInfo', false],
+            ['PayBillList',false],
+            ['PointLogList', false],
+            ['BonusLogList',false],
+            ['WithdrawList', false],
+        ]
+    );
+
+
+    layui.use(['form','table','jquery'], function(){
+
+        let $ = layui.jquery,
+        form = layui.form,
+        table = layui.table;
+        var tabs = layui.tabs;        
+        var util = layui.util;
+
+        // tabs 切换前的事件
+        // tabs.on(`beforeChange(PageHeadTab)`, function(data) {
+        // //     console.log('beforeChange', data);  // 标签相关数据          
+        // //     console.log('data.from.index ',data.from.index); // 切换前的选中标签索引
+        // //     console.log('data.from.headerItem', data.from.headerItem); // 切换前的选中标签头部项
+        //     console.log('data.to.index',data.to.index); // 切换后的选中标签索引
+        //     console.log('data.to.headerItem', data.to.headerItem); // 切换后的选中标签头部项
+        // // // 阻止标签默认切换
+        // // //return false;
+        // });
+        // tabs 切换后的事件
+        tabs.on('beforeChange(PageHeadTab)', function(data) {
+            console.log('afterChange', data);  // 标签相关数据   
+            console.log('data.from.index',data.to.index); // 切换后的选中标签索引
+            console.log('data.to.headerItem', data.to.headerItem); // 切换后的选中标签头部项
+
+            var tabid = data.to.headerItem.attr('lay-id');
+            var tabidx = data.to.index;
+            if (TabsFlagMap[tabid]) {
+                return;
+            }
+            TabsFlagMap[tabid] = true;            
+            switch (tabid) {
+                case 'PayBillList':
+                    RenderPayBillTable();
+                    break;
+                case 'PointLogList':
+                    RenderPointLogTable();
+                    break;
+                case 'BonusLogList':
+                    RenderBonusLogTable();
+                    break;
+                case 'WithdrawList':
+                    RenderWithdrawTable();
+                    break;
+                case 'PayBillList2':
+                    // 获取数据
+                    table.reload('PayBillList2', {                
+                        where: {
+                            ClientUserId:  '{$Model.Id}'
+                        }
+                    });
+
+                default:
+                    break;
+            }
+        });
+
+      
+
+
+    });
+
+//消费记录
+function RenderPayBillTable(){
+    let table = layui.table;
+    table.render({
+        elem: '#PayBillList',
+        method: 'post',
+        url: '/{$Request.module}/PayBill/query', //数据接口
+        request: {
+            pageName: 'PageIndex' //页码的参数名称，默认：page
+            ,limitName: 'PageSize' //每页数据量的参数名，默认：limit
+        },
+        where: {
+            ClientUserId:  '{$Model.Id}'
+        },
+        //data: [{
+        //    'privatestyle': '张三',
+        //    'erptype': '2301',
+        //    'labels': '膳寇'
+        //},               ],
+        defaultToolbar: [],
+        cols: [
+            [{
+                type: 'numbers',
+                title: '序号'
+            },
+            {
+                field: 'OrderNo',
+                title: '订单号',
+                align: 'center'
+            },
+            {
+                field: 'BillNo',
+                title: '单据号',
+                align: 'center'
+            },
+            {
+                field: 'PayPlatNo',
+                title: '微信订单号',
+                align: 'center'
+            },
+
+            {
+                field: 'OrderAmountFee',title: '订单金额', align: 'center'
+                , templet: function (d) { 
+                    if(!CheckNull( d.OrderAmountFee)){
+                        return d.OrderAmountFee * 0.01;
+                    }
+                    }
+            },
+            {
+                field: 'PayAmountFee',
+                title: '付款金额',
+                align: 'center', templet: function (d) { 
+                    Debug('d.PayAmountFee', d.PayAmountFee);
+
+                    if(!CheckNull( d.PayAmountFee)){
+                        return d.PayAmountFee * 0.01;
+                    }
+                    return '';
+                    }
+            },
+            {
+                field: 'CreateTime',title: '创建时间',
+                align: 'center'
+            },
+            {
+                field: 'FinishedTime',title: '完成时间',
+                align: 'center'
+            }
+            ]
+        ],
+        page: true,              
+        limit: 15,
+        limits: [10, 15, 20, 25, 50, 100],
+        skin: 'grid',
+        height: 'full-150'
+    }); //PayBillList end
+
+
+}
+
+
+//积分记录
+function RenderPointLogTable(){
+    let table = layui.table;
+    table.render({
+        elem: '#PointLogList',
+        toolbar: '#toolbarDemo',
+        method: 'post',
+        url: '/{$Request.module}/PointLog/query', //数据接口
+        request: {
+            pageName: 'PageIndex' //页码的参数名称，默认：page
+            ,limitName: 'PageSize' //每页数据量的参数名，默认：limit
+        },
+        where: {
+            ClientUserId: '{$Model.Id}'
+        },
+        defaultToolbar: [],
+        cols: [
+            [{                                            
+                type: 'numbers',
+                title: '序号'
+            },
+            {
+                field: 'OrderNo', 
+                title: '订单号',
+                align: 'center'
+            },
+            {
+                field: 'OldPoints', title: '原来积分', align: 'center'                        
+                ,templet: function (d) { return DisplayAmount(d.OldPoints, '=N/A=') }
+            },                    
+            {
+                field: 'ChangePoints', title: '变动积分', align: 'center'                        
+                ,templet: function (d) { return DisplayAmount(d.ChangePoints, '=N/A=') }
+            },                    
+            {
+                field: 'Rmk',
+                title: '备注',
+                align: 'center'
+            },
+            
+            {
+                field: 'CreateTime',
+                title: '创建日期',
+                align: 'center', templet: function (d) { return DisplayDate(d.CreateTime, 2) }
+            },
+            {
+                field: 'UpdateTime',
+                title: '更新日期',
+                align: 'center', templet: function (d) { return DisplayDate(d.UpdateTime, 2) }
+            },
+            
+            {
+                field: 'AssetTypeId', title: '资产类型', align: 'center',
+                templet: function (d) { return DisplayOrderStatus(d.AssetTypeId,d.AssetTypeName) }
+
+            },                   
+            {
+                field: 'AssetStatusId', title: '状态', align: 'center',
+                templet: function (d) { return DisplayPayStatus(d.AssetStatusId,d.AssetStatusName) }
+            },
+            {
+                field: 'AssetStatusId', title: '模式&来源', align: 'center',
+                templet: function (d) { return DisplayAssetMode(d.AssetModeId,d.AssetStatusName) }
+            }                
+            ]
+        ],
+        page: true,
+        
+        limit: 15,
+        limits: [10, 15, 20, 25, 50, 100],
+        skin: 'grid',
+        height: 'full-170'
+    });//PointLogList end
+
+}
+//奖金记录
+
+function RenderBonusLogTable(){
+    let table = layui.table;
+    table.render({
+        elem: '#BonusLogList',
+        method: 'post',
+        url: '/{$Request.module}/BonusLog/query', //数据接口
+        request: {
+            pageName: 'PageIndex' //页码的参数名称，默认：page
+            ,limitName: 'PageSize' //每页数据量的参数名，默认：limit
+        },
+        where: {
+            ClientUserId:  '{$Model.Id}'
+        },
+        defaultToolbar: [],
+        cols: [
+            [{                                            
+                type: 'numbers',
+                title: '序号'
+            },
+            {
+                field: 'ClientUserId', title: '客户', align: 'center',
+                templet: function (d) { return DisplayUserName(d.ClientUserId,d.ClientNickName,d.ClientRealName) }
+            },                                
+            {
+                field: 'OrderNo', 
+                title: '订单号',
+                align: 'center'
+            },
+            {
+                field: 'Bonus', title: '奖金', align: 'center',
+                templet: function (d) { return DisplayAmount(d.Bonus, '=N/A=') }
+            },
+            {
+                field: 'Rmk',
+                title: '备注',
+                align: 'center'
+            },            
+            {
+                field: 'CreateTime',
+                title: '创建日期',
+                align: 'center', templet: function (d) { return DisplayDate(d.CreateTime, 2) }
+            },
+            {
+                field: 'UpdateTime',
+                title: '更新日期',
+                align: 'center', templet: function (d) { return DisplayDate(d.UpdateTime, 2) }
+            },            
+            {
+                field: 'AssetTypeId', title: '类型', align: 'center',
+                templet: function (d) { return DisplayOrderStatus(d.AssetTypeId,d.AssetTypeName) }
+            },                   
+            {
+                field: 'AssetModeId', title: '奖励模式', align: 'center',
+                templet: function (d) { return DisplayAssetMode(d.AssetModeId,d.AssetTypeName) }
+            },                   
+            {
+                field: 'AssetStatusId', title: '状态', align: 'center',
+                templet: function (d) { return DisplayPayStatus(d.AssetStatusId,d.AssetStatusName) }
+            }
+            ]
+        ],
+        page: true,        
+        limit: 15,
+        limits: [10, 15, 20, 25, 50, 100],
+        skin: 'grid',
+        height: 'full-30'
+    });
+
+
+}
+
+//提现申请
+function RenderWithdrawTable(){
+    let table = layui.table;
+    table.render({
+        elem: '#WithdrawList',
+        method: 'post',
+        url: '/{$Request.module}/Withdraw/query', //数据接口
+        request: {
+            pageName: 'PageIndex' //页码的参数名称，默认：page
+            ,limitName: 'PageSize' //每页数据量的参数名，默认：limit
+        },
+        where: {
+            ClientUserId: '{$Model.Id}'
+        },
+        //data: [{
+        //    'privatestyle': '张三',
+        //    'erptype': '2301',
+        //    'labels': '膳寇'
+        //},               ],
+        defaultToolbar: [],
+        cols: [
+            [{                                            
+                type: 'numbers',
+                title: '序号'
+            },
+            {
+                field: 'ClientUserId', title: '客户', align: 'center',
+                templet: function (d) { return DisplayUserName(d.ClientUserId,d.ClientNickName,d.ClientRealName) }
+            },                                
+            {
+                field: 'CreateTime',
+                title: '创建日期',
+                align: 'center', templet: function (d) { return DisplayDate(d.CreateTime, 2) }
+            },{field: 'OrderNo',title: '订单号',align: 'center'},
+            {
+                field: 'OrderAmountFee', title: '申请金额', align: 'center',
+                templet: function (d) { return DisplayFee(d.OrderAmountFee) }
+            },                     
+            {
+                field: 'PayAmountFee', title: '发放金额/手续费', align: 'center',
+                templet: function (d) { return DisplayFee(d.PayAmountFee,'') + '/'+DisplayFee(d.ProcessingFee,'') }
+            },                     
+    {field: 'BankName',title: '银行名称',align: 'center'},
+    {field: 'BankAccount',title: '银行账号(姓名)',align: 'center'},
+    {field: 'BankCardNo',title: '银行卡卡号',align: 'center'},
+    {field: 'Mobile',title: '联系手机',align: 'center'},                    
+            {
+                field: 'FinishedTime',
+                title: '完成时间',
+                align: 'center', templet: function (d) { return DisplayDate(d.FinishedTime, 2) }
+            },                    
+            {
+                field: 'ArriveTime',
+                title: '到账时间',
+                align: 'center', templet: function (d) { return DisplayDate(d.ArriveTime, 2) }
+            },                    
+            {
+                field: 'IsSuccess', title: '成功标志', align: 'center',
+                templet: function (d) { return DisplayIsEnable(d.IsSuccess) }
+            },                  
+            {
+                field: 'IsFinished', title: '完成标志', align: 'center',
+                templet: function (d) { return DisplayIsEnable(d.IsFinished) }
+            },         
+            {field: 'Rmk',title: '备注',align: 'center'}                   
+            ]
+        ],
+        page: true,
+
+        limit: 15,
+        limits: [10, 15, 20, 25, 50, 100],
+        skin: 'grid',
+        height: 'full-170'
+    }); // WithdrawList end
+}
+
+
+</script>
+
+</body>
+</html>

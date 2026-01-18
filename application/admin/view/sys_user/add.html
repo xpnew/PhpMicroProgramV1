@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
+
+
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-ext/inputTags.css" >
+
+    <style >
+        .layui-textarea{ 
+            min-height: 300px;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>{$title}</legend>
+            </fieldset>
+
+            <form class="layui-form" action="" lay-filter="MainForm">
+                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
+
+
+             
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">登录账号</label>
+                        {if( 0 == $Model -> Id)}                        
+                        <div class="layui-input-block layui-input-wrap">
+                            <div class="layui-input-prefix layui-input-split">
+                            <i class="layui-icon layui-icon-username"></i>
+                            </div>                            
+                            <input type="text" name="LoginName" lay-verify="required"  class="layui-input" />
+                        </div>
+                        {else}
+
+                        <div class="layui-input-block layui-input-wrap">
+                            <div class="layui-input-prefix layui-input-split">
+                            <i class="layui-icon layui-icon-username"></i>
+                            </div>      
+                            <input type="text" name="LoginName" readonly="readonly" lay-verify="required"  class="layui-input" />
+                          
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">密码</label>
+                    <div class="layui-input-block layui-input-wrap">
+                        <div class="layui-input-prefix layui-input-split">
+                        <i class="layui-icon layui-icon-password"></i>
+                        </div>                        
+                        <input type="password" name="pwd" id="pwd" lay-verify="required|pass" lay-reqtext="新的密码不能为空" placeholder="请输入密码" value="" class="layui-input" lay-affix="eye">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">确认密码</label>
+                    <div class="layui-input-block layui-input-wrap">
+                        <div class="layui-input-prefix layui-input-split">
+                        <i class="layui-icon layui-icon-password"></i>
+                        </div>              
+                        <input type="password" name="again_password" lay-verify="required|repass" lay-reqtext="新的密码不能为空" placeholder="确认密码" value="" class="layui-input" lay-affix="eye">
+                    </div>
+                </div>
+
+
+                <div class="layui-form-item  layui-form-text">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="" name="Remark"  id="Remark" autocomplete="off" class="layui-textarea">{$Model->Remark}</textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+    </div>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+            var tags ={};
+
+
+            form.verify({
+                pass: [
+                    /^[\S]{4,12}$/
+                    ,'密码必须4到12位，且不能出现空格'
+                ]
+                ,repass: function(value){
+                    Debug('repass  value :',value);
+                    Debug('repass  $("#pwd").val() :',$('#pwd').val());
+                    if(value != $('#pwd').val()){
+                        return '两次密码不一致';
+                    }
+                }
+            });            
+
+            layui.extend({
+                tinymce: '/lib/tinymce/tinymce'
+            }).use(['tinymce'], function () {
+                var t = layui.tinymce
+                // code ...
+                // 后面无特殊说明，其它代码均写在此处
+                // ...
+                t.render({
+                    elem: "#Remark",
+                    min_height: 500,
+                    // 支持tinymce所有配置      
+                }, (opt, edit) => {
+                    // 加载完成后回调 opt 是传入的所有参数
+                    // edit是当前编辑器实例，等同于t.get返回值
+                });
+
+            })            
+  
+
+            
+
+
+
+
+
+            //监听提交
+            form.on('submit(demo1)', function (data) {
+                console.log(data);
+                Debug(data);
+
+                // if (CheckNull(data.field.EmployeeTypeId)) {
+                //     layer.alert('请选择 职员类型', { icon: 5 });
+                //     return false;
+                // }
+                // Debug('tags   :', tags);
+
+
+
+                // if (null != data) return false;
+                var t = layui.tinymce
+                //if (null != data) return false;
+                var edit = t.get('#Remark');
+                var htmlCot = edit.getContent();
+                data.field.Remark = htmlCot;
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/save',
+                    type: 'post',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+
+                                    if (parent.ReloadList)
+                                        parent.ReloadList();
+                                    if (parent.layer.RefreshTable)
+                                        parent.layer.RefreshTable();
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
+            });
+
+
+                        //表单初始赋值
+            form.val('MainForm', {
+
+                "Id": "{$Model->Id}" //Id主键
+                , "LoginName": "{$Model->LoginName|default=''}" //
+                , "Pwd": "{$Model->Pwd|default=''}" //
+                , "CreateTime": "{$Model->CreateTime|default=''}" //
+                
+                , "UpdateTime": "{$Model->UpdateTime|default=''}" //
+
+            })
+
+
+
+
+
+
+
+        });
+
+	// layui.config({
+	// 	base: '__PUBLIC__lib/layui-ext/',
+	// }).use(['inputTags'], function() {
+	// 	var inputTags = layui.inputTags;
+	// 	inputTags.render({
+	// 		elem: '#Tags', //定义输入框input对象
+	// 		content: [], //默认标签
+	// 		aldaBtn: true, //是否开启获取所有数据的按钮
+	// 		done: function(value) { //回车后的回调
+	// 			console.log("刚刚输入标签===="+value)
+    //             return false;
+	// 		}
+	// 	})
+	// })
+
+    function BuildTags(tags) {
+        if(0 == tags.length)
+            return '';
+        var Result = tags.join('|');
+        Result = '|'+ Result + '|';
+        return Result;
+    }
+    function SplitTags(){
+        var tags = $('#Tags').val();
+        Debug('SplitTags  tags :',tags);
+        if(CheckNull(tags))
+            return [];
+        if(tags.StartWith('|'))
+            tags = tags.substr(1);
+        if(tags.EndWith('|'))
+            tags = tags.substr(0, tags.length-1);
+        return tags.split('|');
+
+    }
+
+    </script>
+</body>
+</html>

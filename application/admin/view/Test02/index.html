@@ -1,0 +1,26 @@
+
+<h1>显示路由信息</h1>
+<dl>
+
+    <dt>1Title</dt>
+    <dd>当前URL: {$Request.url}</dd>
+    <dd>当前域名: {$Request.domain}</dd>
+    <dd>当前入口文件: {$Request.file}</dd>
+
+
+
+
+    <dd>调用Request对象的module方法 : {$Request.module}</dd>
+    <dd>调用Request对象的controller方法: {$Request.controller}</dd>
+    <dd>调用Request对象的action方法: {$Request.action}</dd>
+
+
+    <dd>当前路由规则: {$Request.isGet}</dd>
+    <dd>当前路由规则: {$Request.isPost}</dd>
+    <dd>当前路由规则: {$Request.isPut}</dd>
+    <dd>当前路由规则: {$Request.isDelete}</dd>
+    <dd>当前路由规则: {$Request.isAjax}</dd>
+        <dd>当前路由规则: {$Request.isCli}</dd>
+            <dd>当前路由规则: {$Request.isMobile}</dd>
+
+</dl>
