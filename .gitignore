@@ -8,3 +8,5 @@ thinkphp
 /runtime
 logs
 /src
+/git_init.bat
+uploads
