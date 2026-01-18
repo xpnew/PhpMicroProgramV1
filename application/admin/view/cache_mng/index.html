@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+            <fieldset class="table-search-fieldset">
+                <legend>搜索 {$title}</legend>
+                <div style="margin: 10px 10px 10px 10px">
+                    <form class="layui-form layui-form-pane" action="">
+                        <div class="layui-form-item">
+
+                            <div class="layui-inline">
+                                <label class="layui-form-label">呢称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="NickName" id="NickName" autocomplete="off" class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">手机号</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="Mobile" id="Mobile" autocomplete="off" class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">创客等级</label>
+                                <div class="layui-input-inline">
+                                    <select name="MakerLevel" id="MakerLevel" class="layui-select">
+                                        <option value="">请选择</option>
+                                        <option value="2">创客</option>
+                                        <option value="3">金牌创客</option>
+                                        <option value="1">非创客</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-inline">
+                                <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                        lay-filter="data-search-btn">
+                                    <i class="layui-icon"></i> 搜 索
+                                </button>
+                                <button type="button" class="layui-btn layui-btn-primary" 
+                                        lay-filter="data-search-btn" id="BtShowAll">
+                                    <i class="layui-icon">&#xe60f;</i> 显示全部
+                                </button>
+                            </div>
+                        </div>
+                        <div class="layui-form-item HideSearchDiv" >
+
+                            <div class="layui-inline">
+                                <label class="layui-form-label">注册日期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="DateRang" name="DateRang" value="" autocomplete="off" class="layui-input" placeholder="-" />                                   
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">实名</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="RealityName" id="RealityName" autocomplete="off" class="layui-input" />
+                                </div>
+                            </div> 
+                        </div>
+                    </form>
+                </div>
+            </fieldset>
+
+
+        </div>
+        
+
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+
+
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#DateRang',
+                range: true,
+                min: -90,
+                max:30
+            });
+            
+
+            
+            form.on('submit(data-search-btn)', function (obj) {
+                var BeginTime = ExpiryDate(0);
+                var EndTime = ExpiryDate(1);
+
+                var LoginName = $("input[name='LoginName']").val();
+                var NickName = $("input[name='NickName']").val();
+                var RealityName = $("input[name='RealityName']").val();
+                var Mobile = $("input[name='Mobile']").val();
+                var MakerLevel = $("input[name='MakerLevel']").val();
+
+
+                table.reload('currentTableId', {
+                    method: 'post',
+                    where: {
+                        "BeginTime": BeginTime,
+                        "EndTime": EndTime,
+                        'LoginName': LoginName,
+                        'NickName': NickName,
+                        'Mobile': Mobile,
+                        'RealityName': RealityName,
+                        'MakerLevel': MakerLevel,                       
+                    }
+                }, 'data');
+                return false;
+            });
+
+
+
+
+
+
+            function RefreshTable() {
+                console.log('RefreshTable');
+                table.reload('currentTableId', {
+                    where: {
+                        //name: $('#name').val()
+                    }
+                }, 'data');
+
+            }
+
+
+
+        });
+
+
+        function ReloadList() {
+            console.log('ReloadList');
+           layui.table.reload('currentTableId', {
+                where: {
+                    //name: $('#name').val()
+                }
+            }, 'data');
+        }
+        $(function () {
+            $('#BtShowAll').click(function () {
+                $('.HideSearchDiv').toggle();
+            });
+        });        
+        function ExpiryDate(idx) {
+            var DataVal = $('#DateRang').val();
+            if (!CheckNull(DataVal)) {
+                console.log("arr: ", DataVal.split(' - '));
+                return DataVal.split(' - ')[idx];
+            } else {
+                return null;
+            }
+        }
+    </script>
+</body>
+</html>

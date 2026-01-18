@@ -1,0 +1,9 @@
+<dl>
+    <dt>1Title</dt>
+    {foreach $ModelList as $vo}
+        <dd>
+            <span> {$vo.OptionKey}</span> <span> {$vo.OptionValue}</span>
+            <a href="{:url('admin/index/del',['id'=>$vo.Id])}">删除</a>
+        </dd>
+    {/foreach}
+</dl>

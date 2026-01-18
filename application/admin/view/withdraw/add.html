@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>{$title}</legend>
+            </fieldset>
+
+            <form class="layui-form" action="" lay-filter="MainForm">
+                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
+
+<input type="hidden" name="CreateTime" id="CreateTime" value="" /><!-- 创建时间  -->
+<input type="hidden" name="OrderNo" id="OrderNo" value="" /><!-- 订单号  -->
+<input type="hidden" name="BillNo" id="BillNo" value="" /><!-- 流水号  -->
+<input type="hidden" name="OrderAmountFee" id="OrderAmountFee" value="" /><!-- 订单金额 申请金额   -->
+<input type="hidden" name="PayAmountFee" id="PayAmountFee" value="" /><!-- 支付金额 发放金额   -->
+<input type="hidden" name="ProcessingFee" id="ProcessingFee" value="" /><!-- 手续费  -->
+<input type="hidden" name="RefundAmountFee" id="RefundAmountFee" value="" /><!-- 退款金额  -->
+<input type="hidden" name="IsSuccess" id="IsSuccess" value="" /><!-- 成功标志  -->
+<input type="hidden" name="IsAudit" id="IsAudit" value="" /><!-- 审核标志  -->
+<input type="hidden" name="ArriveTime" id="ArriveTime" value="" /><!-- 到账时间  -->
+<input type="hidden" name="ClientUserId" id="ClientUserId" value="" /><!-- 客户Id  -->
+<input type="hidden" name="Gid" id="Gid" value="" /><!-- Guid  -->
+<input type="hidden" name="PayPlatNo" id="PayPlatNo" value="" /><!-- 支付平台的订单号  -->
+<input type="hidden" name="CreateTS" id="CreateTS" value="" /><!-- 创建时间戳  -->
+<input type="hidden" name="FinishedTS" id="FinishedTS" value="" /><!-- 完成时间戳  -->
+<input type="hidden" name="IsFinished" id="IsFinished" value="" /><!-- 完成标志  -->
+<input type="hidden" name="FinishedTime" id="FinishedTime" value="" /><!-- 完成时间  -->
+<input type="hidden" name="RequestURL" id="RequestURL" value="" /><!-- 请求地址  -->
+<input type="hidden" name="CallbackURL" id="CallbackURL" value="" /><!-- 回调地址  -->
+<input type="hidden" name="LastVisitTime" id="LastVisitTime" value="" /><!--   -->
+<input type="hidden" name="DatePart" id="DatePart" value="" /><!-- 日期  -->
+<input type="hidden" name="PayClientPlatform" id="PayClientPlatform" value="" /><!-- 支付平台名称  -->
+<input type="hidden" name="PayResultStatus" id="PayResultStatus" value="" /><!-- 支付平台结果  -->
+<input type="hidden" name="ClientRealName" id="ClientRealName" value="" /><!-- 客户姓名  -->
+<input type="hidden" name="ClientNickName" id="ClientNickName" value="" /><!-- 客户呢称  -->
+<input type="hidden" name="BankName" id="BankName" value="" /><!-- 银行名称  -->
+<input type="hidden" name="BankAccount" id="BankAccount" value="" /><!-- 银行账号(姓名)  -->
+<input type="hidden" name="BankCardNo" id="BankCardNo" value="" /><!-- 银行卡卡号  -->
+
+
+             
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">申请金额</label>
+                        <div class="layui-input-inline layui-text layui-text-form" id="OrderAmount">
+                            {$Model.OrderAmountFee}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">发放金额</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="PayAmount" name="PayAmount" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">手续费</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="ProcessingAmount"  name="ProcessingAmount" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">银行订单号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="PayPlatNo" name="PayPlatNo" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">发放银行名称</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="PayoutBankName" name="PayoutBankName" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">发放银行账号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="PayoutBankAccount"  name="PayoutBankAccount" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">收款银行账号(姓名)</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.BankAccount}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">收款银行名称</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.BankName}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">银行卡卡号</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.BankCardNo}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">联系手机</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.Mobile}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">会员资料</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.ClientRealName} / {$Model.ClientNickName}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">创建时间</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.CreateTime}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">完成时间</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model.FinishedTime}
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">成功</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="SwitchIsSuccess" lay-skin="switch" lay-filter="SwitchIsSuccess" {if( 1 == $Model.IsSuccess)}  checked {/if} title="是|否">
+                        </div>
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">完成</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="SwitchIsFinished" lay-skin="switch" lay-filter="SwitchIsFinished"  checked title="是|否">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" name="Rmk" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+    </div>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+
+
+
+
+        // 指定开关事件
+        form.on('switch(SwitchIsSuccess)', function(data){
+            $('#IsSuccess').val(this.checked ? '1' : '0');
+            layer.tips(' 允许获取奖励 温馨提示, 新值 ：' + $('#IsSuccess').val(), data.othis)
+        });
+        form.on('switch(SwitchIsFinished)', function(data){
+            // $('#IsFinished').val(this.checked ? '1' : '0');
+            // layer.tips(' 允许获取奖励 温馨提示, 新值 ：' + $('#IsFinished').val(), data.othis)
+        });
+
+
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            console.log(data);
+            Debug(data);
+            // if (CheckNull(data.field.EmployeeTypeId)) {
+            //     layer.alert('请选择 职员类型', { icon: 5 });
+            //     return false;
+            // }
+
+            // if (null != data) return false;
+
+            $.ajax({
+                url: '/{$Request.module}/{$Request.controller}/save',
+                type: 'post',
+                dataType: 'json',
+                data: data.field,
+                success: function (data) {
+                    console.log(data);
+                    //Info,Success,Warning,Error
+                    var type = data.Type;
+                    if (0 < data.StatusCode) {
+                        layer.msg(data.Title, { icon: 6, time: 2000 },
+                            function () {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+
+                                if (parent.ReloadList)
+                                    parent.ReloadList();
+                                if (parent.layer.RefreshTable)
+                                    parent.layer.RefreshTable();
+                            });
+
+                    } else {
+                        layer.alert(data.Title, { icon: 5 });
+                    }
+                }
+            });
+            //layer.alert(JSON.stringify(data.field), {
+            //    title: '最终的提交信息'
+            //})
+            return false;
+        });
+
+
+        //表单初始赋值
+        form.val('MainForm', {
+
+            "Id": "{$Model->Id}" //Id主键
+, "CreateTime": "{$Model->CreateTime|default=''}" // 创建时间
+, "OrderNo": "{$Model->OrderNo|default=''}" // 订单号
+, "BillNo": "{$Model->BillNo|default=''}" // 流水号
+, "OrderAmountFee": "{$Model->OrderAmountFee|default=''}" // 订单金额 申请金额
+, "PayAmountFee": "{$Model->PayAmountFee|default=''}" // 支付金额 发放金额
+, "ProcessingFee": "{$Model->ProcessingFee|default=''}" // 手续费
+, "RefundAmountFee": "{$Model->RefundAmountFee|default=''}" // 退款金额
+, "IsSuccess": "{$Model->IsSuccess|default=''}" // 成功标志
+, "IsAudit": "{$Model->IsAudit|default=''}" // 审核标志
+, "ArriveTime": "{$Model->ArriveTime|default=''}" // 到账时间
+, "ClientUserId": "{$Model->ClientUserId|default=''}" // 客户Id
+, "Gid": "{$Model->Gid|default=''}" // Guid
+, "PayPlatNo": "{$Model->PayPlatNo|default=''}" // 支付平台的订单号
+, "Rmk": "{$Model->Rmk|default=''}" // 备注
+, "CreateTS": "{$Model->CreateTS|default=''}" // 创建时间戳
+, "FinishedTS": "{$Model->FinishedTS|default=''}" // 完成时间戳
+, "IsFinished": "{$Model->IsFinished|default=''}" // 完成标志
+, "FinishedTime": "{$Model->FinishedTime|default=''}" // 完成时间
+, "RequestURL": "{$Model->RequestURL|default=''}" // 请求地址
+, "CallbackURL": "{$Model->CallbackURL|default=''}" // 回调地址
+, "LastVisitTime": "{$Model->LastVisitTime|default=''}" //
+, "DatePart": "{$Model->DatePart|default=''}" // 日期
+, "PayClientPlatform": "{$Model->PayClientPlatform|default=''}" // 支付平台名称
+, "PayResultStatus": "{$Model->PayResultStatus|default=''}" // 支付平台结果
+, "ClientRealName": "{$Model->ClientRealName|default=''}" // 客户姓名
+, "ClientNickName": "{$Model->ClientNickName|default=''}" // 客户呢称
+, "BankName": "{$Model->BankName|default=''}" // 银行名称
+, "BankAccount": "{$Model->BankAccount|default=''}" // 银行账号(姓名)
+, "BankCardNo": "{$Model->BankCardNo|default=''}" // 银行卡卡号
+, "Mobile": "{$Model->Mobile|default=''}" // 联系用的手机号
+, "PayoutBankName": "{$Model->PayoutBankName|default=''}" // 发放银行名称
+, "PayoutBankAccount": "{$Model->PayoutBankAccount|default=''}" // 发放银行账号  
+        })
+
+
+
+
+
+
+
+        });
+
+    $(function () {
+        SetAmout();
+    })
+    function SetAmout() {
+        //var RefundAmountFee = $('#RefundAmountFee').val();
+        var OrderAmountFee = $('#OrderAmountFee').val();
+        var PayAmountFee = $('#PayAmountFee').val();
+        var ProcessingFee = $('#ProcessingFee').val();
+
+        if(CheckNull(PayAmountFee)){
+            PayAmountFee = OrderAmountFee;
+        }
+        // Debug('OrderAmountFee:' ,OrderAmountFee);
+        // Debug('PayAmountFee:' ,PayAmountFee);
+        // Debug('ProcessingFee:' ,ProcessingFee);
+        var OrderAmount = parseFloat(OrderAmountFee) * 0.01;
+        var PayAmount = parseFloat(PayAmountFee) * 0.01;
+
+        $('#OrderAmount').text(OrderAmount);
+        $('#PayAmount').val(PayAmount);
+
+
+        if(! CheckNull(ProcessingFee)){
+           var ProcessingAmount = parseFloat(ProcessingFee) * 0.01;
+           $('#ProcessingAmount').val(ProcessingAmount);
+
+        }else{
+            $('#ProcessingAmount').val(0);
+        }
+
+    }
+    
+
+    </script>
+</body>
+</html>

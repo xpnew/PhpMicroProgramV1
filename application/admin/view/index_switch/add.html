@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>{$title}</legend>
+            </fieldset>
+
+            <form class="layui-form" action="" lay-filter="MainForm">
+                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
+                <input type="hidden" name="Pic" id="Pic" /><!-- Id主键 -->
+
+             
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <input type="text" name="Title" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">推荐(大→小)</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <input type="text" name="TopNum" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                </div>
+                
+
+
+                <div class="layui-form-item">
+                   
+                    <div class="layui-inline">
+                        <label class="layui-form-label">图片</label>
+                        <div class="layui-input-inline">
+                           <button type="button" class="layui-btn" id="ID-upload-demo-btn">
+                            <i class="layui-icon layui-icon-upload"></i> 单图片上传
+                            </button>
+                            <div style="width: 132px;">
+                                <div class="layui-upload-list">
+                                    <img class="layui-upload-img" id="ID-upload-demo-img" style="width: 100%; height: 92px;" src="{$Model->Pic|default=''}">
+                                    <div id="ID-upload-demo-text"></div>
+                                </div>
+                                <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="filter-demo">
+                                    <div class="layui-progress-bar" lay-percent=""></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">创建日期</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                           {$Model->CreateTime|default=''}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">更新日期</label>
+                        <div class="layui-input-inline layui-text layui-text-form">
+                            {$Model->UpdateTime|default=''}
+                        </div>
+                    </div>
+
+                </div>                
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" name="Remarks" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+    </div>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+            // 自定义验证规则
+            form.verify({
+                // 确认密码
+                confirmPassword: function (value, item) {
+                    var passwordValue = $('#RegPwd').val();
+                    if (value !== passwordValue) {
+                        return '两次密码输入不一致';
+                    }
+                }
+
+            });
+
+
+              // 单图片上传
+  var uploadInst = upload.render({
+    elem: '#ID-upload-demo-btn',
+    url: '/{$Request.module}/Upload/save', // 实际使用时改成您自己的上传接口即可。
+    data: {'ClientWorkName':'{$Request.module}/{$Request.controller}','ClientTypeId':'60004000',ClientTypeName:'首页轮换图片',Remark:'首页轮换图片'},
+    before: function(obj){
+      // 预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#ID-upload-demo-img').attr('src', result); // 图片链接（base64）
+      });
+      
+      element.progress('filter-demo', '0%'); // 进度条复位
+      layer.msg('上传中', {icon: 16, time: 0});
+    },
+    done: function(res){
+        Debug('upload  res :',res);
+      // 若上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      // 上传成功的一些操作
+      // …
+      $('#Pic').val(res.DataInfo.VisualPath); 
+
+      $('#ID-upload-demo-text').html(''); // 置空上传失败的状态
+    },
+    error: function(ex){
+        Debug('upload  error :', ex);
+      // 演示失败状态，并实现重传
+      var demoText = $('#ID-upload-demo-text');
+      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+      demoText.find('.demo-reload').on('click', function(){
+        uploadInst.upload();
+      });
+    },
+    // 进度条
+    progress: function(n, elem, e){
+      element.progress('filter-demo', n + '%'); // 可配合 layui 进度条元素使用
+      if(n == 100){
+        layer.msg('上传完毕', {icon: 1});
+      }
+    }
+  });
+
+
+            //监听提交
+            form.on('submit(demo1)', function (data) {
+                console.log(data);
+                Debug(data);
+                // if (CheckNull(data.field.EmployeeTypeId)) {
+                //     layer.alert('请选择 职员类型', { icon: 5 });
+                //     return false;
+                // }
+
+                //if (null != data) return false;
+
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/save',
+                    type: 'post',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    parent.layer.close(index);
+
+                                    if (parent.ReloadList)
+                                        parent.ReloadList();
+                                    if (parent.layer.RefreshTable)
+                                        parent.layer.RefreshTable();
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
+            });
+
+
+                        //表单初始赋值
+            form.val('MainForm', {
+
+                "Id": "{$Model->Id}" //Id主键
+                , "Title": "{$Model->Title}" //登录账号
+                , "TopNum": "{$Model->TopNum|default=''}" //登录账号
+                , "UpdateTime": "{$Model->UpdateTime|default=''}" //登录账号
+                , "Remarks": "{$Model->Remarks|default=''}" //登录账号
+                , "Pic": "{$Model->Pic|default=''}" //登录账号
+               
+            })
+
+
+
+
+
+
+
+        });
+
+
+
+    </script>
+</body>
+</html>

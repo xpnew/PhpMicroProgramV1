@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>{$title}</legend>
+            </fieldset>
+
+            <form class="layui-form" action="" lay-filter="MainForm">
+                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
+
+<input type="hidden" name="AgentLevel" id="AgentLevel" value="" /><!-- 代理等级：1 省 2 市  3县  -->
+
+
+<input type="hidden" name="CommenceTime" id="CommenceTime" value="" /><!-- 开始时间  -->
+<input type="hidden" name="ExpireStopTime" id="ExpireStopTime" value="" /><!-- 过期时间  -->
+<input type="hidden" name="InaugurateTime" id="InaugurateTime" value="" /><!-- 首次合作开始时间  -->
+
+<input type="hidden" name="ProvinceId_Old" id="ProvinceId_Old" value="{$Model.ProvinceId}" /><!-- 代理等级：1 省 2 市  3县  -->
+<input type="hidden" name="CityId_Old" id="CityId_Old" value="{$Model.CityId}" /><!-- 代理等级：1 省 2 市  3县  -->
+<input type="hidden" name="CountyId_Old" id="CountyId_Old" value="{$Model.CountyId}" /><!-- 代理等级：1 省 2 市  3县  -->
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">省</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <select name="ProvinceId" id="ProvinceId" lay-verify="required" lay-filter="ProvinceId" lay-search>
+                                <option value="">请选择</option>                             
+                            </select>
+                        </div>
+                    </div>                    
+                    <div class="layui-inline">
+                        <label class="layui-form-label">市</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <select name="CityId" id="CityId" lay-verify="required"  lay-filter="CityId" lay-search>
+                                <option value="">请选择</option>                             
+                            </select>
+                        </div>
+                    </div>                    
+                    <div class="layui-inline">
+                        <label class="layui-form-label">区县</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <select name="CountyId" id="CountyId" lay-verify="required" lay-filter="CountyId"  lay-search>
+                                <option value="">请选择</option>                             
+                            </select>
+                        </div>
+                    </div>                    
+                    <div class="layui-inline">
+                        <label class="layui-form-label">地区名称</label>
+                        <div class="layui-input-inline layui-text-form">
+                            <input type="text" readonly id="RegionName" name="RegionName" lay-verify="required" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">会员Id</label>
+                        <div class="layui-input-inline layui-text layui-text-form layui-input-group" id="div_ClientUserId">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-user"></i>
+                            </div>                        
+                            <input type="text" readonly id="ClientUserId" lay-on="ClientUserSelector" class="layui-input"  name="ClientUserId" value="{$Model.ClientUserId}" />
+                            <div class="layui-input-suffix btn-selector-open">
+                                <button type="button"  class="layui-btn layui-btn-primary  bt4selector" lay-on="ClientUserSelector" >                                    
+                                    <i class="layui-icon"></i>                                    
+                                </button>
+                            </div>                            
+                        </div>
+                        
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">呢称</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" readonly id="NickName" lay-on="ClientUserSelector" class="layui-input"  name="NickName" value="" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" readonly id="RealityName" lay-on="ClientUserSelector" class="layui-input"  name="RealityName" value="" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">手机号</label>
+                        <div class="layui-input-inline  layui-text-form">
+                            <input type="text" readonly id="Mobile" lay-on="ClientUserSelector" class="layui-input"  name="Mobile" value="" />
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" name="Rmk" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+        
+        </form>
+    </div>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            var upload = layui.upload;
+            var element = layui.element;
+
+
+
+
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            console.log(data);
+            Debug(data);
+            // if (CheckNull(data.field.EmployeeTypeId)) {
+            //     layer.alert('请选择 职员类型', { icon: 5 });
+            //     return false;
+            // }
+
+            // if (null != data) return false;
+
+            $.ajax({
+                url: '/{$Request.module}/{$Request.controller}/save',
+                type: 'post',
+                dataType: 'json',
+                data: data.field,
+                success: function (data) {
+                    console.log(data);
+                    //Info,Success,Warning,Error
+                    var type = data.Type;
+                    if (0 < data.StatusCode) {
+                        layer.msg(data.Title, { icon: 6, time: 2000 },
+                            function () {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+
+                                if (parent.ReloadList)
+                                    parent.ReloadList();
+                                if (parent.layer.RefreshTable)
+                                    parent.layer.RefreshTable();
+                            });
+
+                    } else {
+                        layer.alert(data.Title, { icon: 5 });
+                    }
+                }
+            });
+            //layer.alert(JSON.stringify(data.field), {
+            //    title: '最终的提交信息'
+            //})
+            return false;
+        });
+
+        form.on('select(ProvinceId)', function (data) {
+            Debug('ProvinceId  data: ', data);
+            Debug('ProvinceId  data.value: ', data.value);
+            OnProvinceChange();
+        });
+        form.on('select(CityId)', function (data) {
+            Debug('CityId  data.value: ', data.value);
+            OnCityChange();
+        });
+        form.on('select(CountyId)', function (data) {
+            Debug('CountyId  data.value: ', data.value);
+            OnCountyChange();
+        });
+
+            util.on('lay-on', {
+                'ClientUserSelector': function () {
+                    var Path = "/{$Request.module}/Selector/Client";
+                    Path += '?_dx=' + Math.random();
+                    layer.open({
+                        type: 2,
+                        area: ['90%', '90%'],
+                        title: false, // 不显示标题栏
+                        closeBtn: 0,
+                        shadeClose: true, // 点击遮罩关闭层
+                        content: Path,
+                        end: function () {
+                            // layer.msg('关闭后的回调', {icon:6});
+                        }
+                    });
+                }
+
+            });
+
+
+
+
+        //表单初始赋值
+        form.val('MainForm', {
+
+            "Id": "{$Model->Id}" //Id主键
+, "ClientUserId": "{$Model->ClientUserId|default=''}" // 客户Id
+, "ProvinceId": "{$Model->ProvinceId|default=''}" // 省Id
+, "CityId": "{$Model->CityId|default=''}" // 市Id
+, "CountyId": "{$Model->CountyId|default=''}" // 县Id
+, "RegionName": "{$Model->RegionName|default=''}" // 地区名称
+, "AgentLevel": "{$Model->AgentLevel|default=''}" // 代理等级：1 省 2 市  3县
+, "NickName": "{$Model->NickName|default=''}" // 呢称
+, "RealityName": "{$Model->RealityName|default=''}" // 实名
+, "Mobile": "{$Model->Mobile|default=''}" // 手机号
+, "CreateTime": "{$Model->CreateTime|default=''}" // 创建时间
+, "UpdateTime": "{$Model->UpdateTime|default=''}" // 修改时间
+, "CommenceTime": "{$Model->CommenceTime|default=''}" // 开始时间
+, "ExpireStopTime": "{$Model->ExpireStopTime|default=''}" // 过期时间
+, "InaugurateTime": "{$Model->InaugurateTime|default=''}" // 首次合作开始时间
+, "Rmk": "{$Model->Rmk|default=''}" // 备注
+
+        })
+            layui.form.render($('#ProvinceId')); 
+
+        });
+
+
+        function SetClientUserJson(jsonObj) {
+            if (CheckNull(jsonObj)) return;
+
+            var formdata = layui.form.val('MainForm');
+            Debug('formdata', formdata);
+            Debug('jsonObj', jsonObj);
+            layui.form.val('MainForm', {
+                "ClientUserId": jsonObj.ClientUserId,
+                "Mobile": jsonObj.Mobile,
+                "RealityName": jsonObj.RealityName,
+                "NickName": jsonObj.NickName,
+
+            });
+            //$('#SupplierName').val(jsonObj.SupplierName)
+            //layui.form.render($('#SupplierName')); // 仅渲染 id="select-id" 的表单项
+            //layui.form.render($('#MainForm')); // 仅渲染 id="select-id" 的表单项
+
+            Debug('formdata', formdata);
+
+
+        }
+
+    </script>
+
+<script>
+    let CurrProvinceName = '';
+    let CurrCityName = '';
+    let CurrCountyName = '';
+
+    $(function () {
+        LoadProvince();
+    })
+    $('#ProvinceId').change(function () {
+        Debug('ProvinceId change');
+        var ProvinceId = $(this).val();
+        if (CheckNull(ProvinceId)) return;
+        LoadCity(ProvinceId);
+        $('#CountyId').html('<option value="">请选择</option>');
+        CurrProvinceName = $('#ProvinceId option:selected').text();
+        CurrCountyName = '';
+        CurrCityName = '';
+        SetRegionName();
+    });
+
+    $('#CityId').change(function () {
+        var CityId = $(this).val();
+        if (CheckNull(CityId)) return;
+        LoadCounty(CityId);
+        CurrCityName = $('#CityId option:selected').text();
+        CurrCountyName = '';    
+        SetRegionName();
+    });
+    $('#CountyId').change(function () {
+        var CountyId = $(this).val();
+        if (CheckNull(CountyId)) return;
+        CurrCountyName = $('#CountyId option:selected').text();
+        SetRegionName();
+    });
+    function OnProvinceChange() {
+        Debug('ProvinceId change');        
+        var ProvinceId = $('#ProvinceId').val();
+        if (CheckNull(ProvinceId)) return;
+
+        // var ProvinceId = $(this).val();
+        // if (CheckNull(ProvinceId)) return;
+        LoadCity(ProvinceId);
+        $('#CountyId').html('<option value="">请选择</option>');
+        CurrProvinceName = $('#ProvinceId option:selected').text();
+        CurrCountyName = '';
+        CurrCityName = '';
+        SetRegionName();
+    }
+    function OnCityChange() {
+        var CityId = $('#CityId').val();
+        if (CheckNull(CityId)) return;
+        LoadCounty(CityId);
+        CurrCityName = $('#CityId option:selected').text();
+        CurrCountyName = '';    
+        SetRegionName();
+    }
+    function OnCountyChange() {
+        var CountyId = $('#CountyId').val();
+        if (CheckNull(CountyId)) return;
+        CurrCountyName = $('#CountyId option:selected').text();
+        SetRegionName();
+    }
+
+
+    function LoadProvince() {
+        let OldValue = $('#ProvinceId_Old').val();
+        FillRegionSelector(1, 0, 'ProvinceId',function () {
+            if(null != OldValue &&  0 < OldValue){
+                $('#ProvinceId').val(OldValue);
+                LoadCity(OldValue);           
+            }
+        });
+    }
+    function LoadCity(ProvinceId) {
+        let OldValue = $('#CityId_Old').val();
+        FillRegionSelector(2, ProvinceId, 'CityId',function () {    
+            if(null != OldValue &&  0 < OldValue){
+                $('#CityId').val(OldValue);
+                LoadCounty(OldValue); 
+            }
+        });
+    }  
+    function LoadCounty(CityId) {
+        let OldValue = $('#CountyId_Old').val();
+        FillRegionSelector(3, CityId, 'CountyId',function () {    
+            if(null != OldValue &&  0 < OldValue){
+                $('#CountyId').val(OldValue);
+            }
+        });
+    }
+    function SetRegionName(){
+        $('#RegionName').val(CurrProvinceName + CurrCityName + CurrCountyName);
+        // Debug('RegionName .length', $('#RegionName').length);
+        // Debug('RegionName   : ',  $('#RegionName') );
+        // Debug('CurrProvinceName   : ', CurrProvinceName );
+    }
+
+    function FillRegionSelector(LevelId, ParentId, SelectId,func) {
+        $.ajax({
+            url: '/api/Region/CommRegion',
+            type: 'post',
+            dataType: 'json',
+            data: { LevelId: LevelId, ParentId: ParentId, Fromtype :'1' },
+            success: function (ResultMsg) {
+                if (0 < ResultMsg.StatusCode) {
+                    var html = '<option value="">请选择</option>';
+                    // Debug('ResultMsg.DataInfo', ResultMsg.DataInfo);
+                    // Debug('ResultMsg.DataInfo.length', ResultMsg.DataInfo.length);
+                    // Debug('SelectId', SelectId);
+                    for (var i = 0; i < ResultMsg.DataInfo.length; i++) {
+                        html += '<option value="' + ResultMsg.DataInfo[i].RegionId + '">' + ResultMsg.DataInfo[i].RegionName + '</option>';
+                    }
+                    $('#' + SelectId).html(html);
+                    if(null != func && 'function' == typeof func){
+                        func();
+                    }
+                    layui.form.render($('#' + SelectId)); // 仅渲染 id="select-id" 的表单项
+                }
+            }
+        })
+    }   
+
+
+</script>    
+</body>
+</html>

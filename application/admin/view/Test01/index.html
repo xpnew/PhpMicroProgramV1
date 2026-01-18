@@ -1,0 +1,9 @@
+<dl>
+    <dt>1Title</dt>
+    {foreach $users as $vo}
+        <dd>
+            <span> {$vo.LoginName}</span> <span> {$vo.Pwd}</span>
+            <a href="{:url('admin/index/del',['id'=>$vo.Id])}">删除</a>
+        </dd>
+    {/foreach}
+</dl>

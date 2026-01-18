@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="__PUBLIC__lib/layui-v2.11.6/css/layui.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/public.css" media="all">
+    <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
+    <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
+
+    <style>
+        .layui-table-cell {
+            height: auto;
+            line-height: 22px;
+            white-space: normal;
+            max-height: 160px;
+            text-overflow: clip;
+        }
+    </style>
+</head>
+<body>
+    <div class="layuimini-container">
+        <div class="layuimini-main">
+
+
+            <script type="text/html" id="toolbarDemo">
+                <div class="layui-btn-container">
+                    <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add" id="AddBtn">
+                        添加
+                    </button>
+                </div>
+            </script>
+
+        </div>
+        
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+  <script type="text/html" id="ValSetTpl">
+    <div class="layui-form layui-form-testcss">
+      <div class="layui-input-wrap">
+        {{#  if(d.ValType=='int' || d.ValType=='decimal') { }}
+        <input name="SetVal" value="{{= d.Val || '' }}" lay-affix="clear" {{# if(0 ==  d.IsEnableNull) { }} lay-verify="required" {{# } }} placeholder="填入 {{=d.Code}}" class="layui-input" lay-affix="number" />
+        {{#  } else { }}
+        <input name="SetVal" value="{{= d.Val || '' }}" lay-affix="clear" placeholder="填入 {{=d.Code}}" class="layui-input"  {{# if(0 ==  d.IsEnableNull) { }} lay-verify="required" {{# } }} />
+        {{#  }  }}
+        <input type="hidden" name="Id" value="{{= d.Id  }}" />
+        <input type="hidden" name="ValType" value="{{= d.ValType  }}" />
+        <input type="hidden" name="OldVal" value="{{= d.Val  }}" />
+      </div>
+
+      <div>
+        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="val-submit">确认</button>
+      </div>
+    </div>
+  </script>
+    </div>
+
+    <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
+    <script>
+        layui.use(['form', 'table', 'jquery'], function () {
+            let $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            var util = layui.util;
+            table.render({
+                elem: '#currentTableId',
+                toolbar: '#toolbarDemo',
+                method: 'post',
+                url: '/{$Request.module}/{$Request.controller}/query', //数据接口
+                request: {
+                    pageName: 'PageIndex' //页码的参数名称，默认：page
+                   ,limitName: 'PageSize' //每页数据量的参数名，默认：limit
+                },
+                where: {
+                    Search: $('#ClassName').val()
+                },
+                //data: [{
+                //    'privatestyle': '张三',
+                //    'erptype': '2301',
+                //    'labels': '膳寇'
+                //},               ],
+                defaultToolbar: [],
+                cols: [
+                    [{
+                        type: 'numbers',
+                        title: '序号'
+                    },
+                    {field: 'Des',title: '说明',align: 'center'},
+                    {field: 'Code',title: '代码',align: 'center'},
+                    {field: 'ValType',title: '值的类型， int  string decimal等等',align: 'center'},
+                    {field: 'Val',title: '设置',align: 'center',templet: '#ValSetTpl'},
+
+                    {field: 'ValDefault',title: '默认值',align: 'center'},
+                    {field: 'IsLock',title: '锁定状态，0 未锁定 ， 1 已锁定，锁定的不能修改',align: 'center',
+                        templet: function (d) {
+                            if (d.IsLock == 1) {
+                                return '<span style="color:red;">已锁定</span>';
+                            } else {
+                                return '<span style="color:green;">未锁定</span>';
+                            }
+                        }
+                    },
+                    {field: 'Rmk',title: '备注',align: 'center'}
+
+
+                    ]
+                ],
+                page: true,
+                limit: 9999,
+                limits: [10, 15, 20, 25, 50, 100],
+                skin: 'grid',
+                height: 'full-10'
+            });
+            form.on('submit(data-search-btn)', function (obj) {
+
+                var FTime = $("input[name='FTime']").val();
+                var ETime = $("input[name='ETime']").val();
+                var ClassId = $('#ClassId').val();
+                var ProductName = $("input[name='ProductName']").val();
+
+
+                table.reload('currentTableId', {
+                    method: 'post',
+                    where: {
+                        'ClassId': ClassId,
+                        'ProductName': ProductName,
+                       
+                    }
+                }, 'data');
+                return false;
+            });
+
+    /**
+       * toolbar 上部功能区 监听事件  此处 针对lay-filter="" 而不是dom id
+       */
+    table.on('toolbar(currentTableFilter)', function (obj) {
+            var ModelData = obj.data;
+            if (obj.event === 'addssss') {  // 监听添加操作
+                Debug('上部功能区 监听事件');
+                var Path = '/{$Request.module}/{$Request.controller}/add';
+                Path += '?_dx=' + Math.random() ;
+                var index = layer.open({
+                    title: '添加{$title}' ,
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: false,
+                    area: ['90%', '90%'],
+                    content: Path,
+                    //end: function () {
+                    //    RefreshTable();
+                    //}
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            }
+    });
+
+
+
+
+    /**
+       * tool 右边操作区区 监听事件
+       */
+            table.on('tool(currentTableFilter)', function (obj) {
+            var ModelData = obj.data;
+            if (obj.event === 'edit') {  // 监听添加操作
+           var Path = '/{$Request.module}/{$Request.controller}/edit';
+            Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id;
+            var index = layer.open({
+                title: '{$title} - 修改' ,
+                type: 2,
+                shade: 0.2,
+                maxmin: true,
+                shadeClose: false,
+                area: ['90%', '90%'],
+                content: Path,
+            //    end: function () {
+            //        RefreshTable();
+            //    }
+            });
+            $(window).on("resize", function () {
+                layer.full(index);
+            });
+                return false;
+            
+
+            } else if (obj.event === 'delete') {
+                layer.confirm('您确定要删除所选数据吗', {
+                    btn: ['是的', '取消'] //按钮
+                }, function () {
+                    var oldData = table.cache["currentTableId"];
+
+                    var Path = '/{$Request.module}/{$Request.controller}/delete';
+                    Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id;
+                    $.ajax({
+                        url: Path,
+                        type: 'post',
+                        dataType: 'json',
+                        data: ModelData,
+                        success: function (data) {
+                            console.log(data);
+                            //Info,Success,Warning,Error
+                            var type = data.Type;
+                            if (0  ==  data.code) {
+                                layer.msg(data.msg, { icon: 6, time: 2000 }, function () { });
+                                Debug("oldData", oldData);
+                                for (var i = 0; i < oldData.length; i++) {
+                                    row = oldData[i];
+                                    if (row.Id === ModelData.Id) {
+                                        Debug('has find row: ' + row.Id);
+                                        oldData.splice(i, 1);    //删除一项
+                                        Debug("oldData", oldData);
+                                    }
+                                };
+                                //table.reload('currentTableId', {
+                                //    data: oldData
+                                //});
+                                table.renderData('currentTableId');
+
+
+
+                            } else {
+                                layer.alert(data.msg, { icon: 5 });
+                            }
+                        }
+                    }); //end ajax
+
+
+
+                    return false;
+                }, function () {
+                    return;
+                });
+                }
+            });
+
+    // 表单提交
+    form.on('submit(val-submit)', function(data){
+      var field = data.field; // 获取表单字段值
+      Debug('表单数据： ', data);
+      Debug('表单字段', field);
+      // 显示填写结果，仅作演示用
+      //layer.alert(JSON.stringify(field), {
+        //title: '当前填写的字段值'
+      //});
+      // 此处可执行 Ajax 等操作
+      // …
+        $.ajax({
+            url: '/{$Request.module}/{$Request.controller}/save',
+            type: 'post',
+            dataType: 'json',
+            data: data.field,
+            success: function (data) {
+                console.log(data);
+                //Info,Success,Warning,Error
+                var type = data.Type;
+                if (0 < data.StatusCode) {
+                    field.OldVal = field.SetVal;
+                    layer.msg(data.Title, { icon: 6, time: 2000 },
+                        function () {
+                            
+                        });
+
+                } else {
+                    layer.alert(data.Title, { icon: 5 });
+                }
+            }
+        });
+
+
+      
+      return false; // 阻止默认 form 跳转
+    });
+
+            function RefreshTable() {
+                console.log('RefreshTable');
+                table.reload('currentTableId', {
+                    where: {
+                        //name: $('#name').val()
+                    }
+                }, 'data');
+
+            }
+            // 按ESC键关闭侧边栏
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+
+        });
+
+
+        function ReloadList() {
+            console.log('ReloadList');
+           layui.table.reload('currentTableId', {
+                where: {
+                    //name: $('#name').val()
+                }
+            }, 'data');
+        }
+
+    </script>
+</body>
+</html>
