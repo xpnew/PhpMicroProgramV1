@@ -7,7 +7,7 @@ use app\comm\AliSms\SmsUtil;
 
 use app\comm\Token\TokenMng;
 use app\comm\Token\TokenItem;
-
+use think\facade\Config  AS SysCfg;
 
 ///陌生人 陌生用户相关的功能
 
@@ -42,7 +42,22 @@ class Stranger extends CommControllerBase
         $this -> Msg -> Body = $NewCode;
     
         // return $this-> SendJOk('发送成功' );
-        $Return =  SmsUtil::Send($phone,$NewCode);
+
+        $AliConfig = [];
+
+
+        $AliConfig['AccessSet'] = [
+            'accessKeyId' =>  SysCfg::get('sms.aliyunkey1'),
+            'accessKeySecret' =>  SysCfg::get('sms.aliyunkey2'),
+        ];
+
+        $AliConfig['Template'] = [
+            'signName' =>  SysCfg::get('sms.aliyun_sms_templateid'),
+            'templateCode' =>  SysCfg::get('sms.aliyun_sms_templatcode'),
+        ];
+
+
+        $Return =  SmsUtil::Send($phone,$NewCode,$AliConfig);
         $this -> SayLog('TestSms2 PhoneCheck Return:'.json_encode($Return));
         if('OK' == $Return -> code){
             $SmsMng -> Set($phone,$NewCode);

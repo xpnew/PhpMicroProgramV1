@@ -13,7 +13,7 @@ use Darabonba\OpenApi\Models\Config;
 use AlibabaCloud\SDK\Dysmsapi\V20170525\Models\SendSmsRequest;
 use AlibabaCloud\Tea\Utils\Utils\RuntimeOptions;
 
-
+use think\facade\Config AS SysConf;
 
 class SmsUtil{
 
@@ -21,22 +21,19 @@ class SmsUtil{
      * 使用凭据初始化账号Client
      * @return Dysmsapi Client
      */
-    public  static function createClient(){
+    public  static function createClient($syscfg){
         // 工程代码建议使用更安全的无AK方式，凭据配置方式请参见：https://help.aliyun.com/document_detail/311677.html。
         $credential = new Credential();
-        $config = new Config([
-           //"credential" => $credential
-            'accessKeyId' => 'LTAI5tMTZWMejgVM3sdPKLaT',
-    'accessKeySecret' => 'Qv2gtYY86V5oNGTqgtaEt2fYvbRqPv',
-        ]);
+
+        $config = new Config($syscfg);
         // 配置协议类型为 HTTPS
-$config->protocol = "HTTPS";
+        $config->protocol = "HTTPS";
         // Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
         $config->endpoint = "dysmsapi.aliyuncs.com";
         return new Dysmsapi($config);
     }
 
-    public static function Send($phone, $code){
+    public static function Send($phone, $code,$syscfg){
         // $obj = new stdClass();
         // var_dump($obj);
 
@@ -46,23 +43,53 @@ $config->protocol = "HTTPS";
         // $Rt = new stdClass();
         $Rt = (object)[];
         $Rt -> Status = false;
-        $Rt -> Message = '';
+        $Rt -> message = '';
         $Rt -> code = 'error';
 
 
+
+
         if(empty($phone)){
-            $Rt -> Message = '手机号码不能为空';
+            $Rt -> message = '手机号码不能为空';
             return $Rt;
         }
 
-        $client = self::createClient();
-        $sendSmsRequest = new SendSmsRequest([
-                  "phoneNumbers" => $phone,
-            "signName" => "沈北新区御享健康",
-            "templateCode" => "SMS_495855539",
-            "templateParam" => "{\"code\":\"".$code."\"}" 
-        
-        ]);
+
+        $client = self::createClient($syscfg['AccessSet']);
+
+//        echo  '<br/> ===============================<br />';
+//        var_dump($client);
+//        echo  '<br/> ===============================<br />';
+        $ReqArguments =[
+
+            "phoneNumbers" => $phone,
+
+        ];
+        $ReqArguments   =  $ReqArguments +  $syscfg['Template'];
+
+        $ReqArguments['templateParam'] =  "{\"code\":\"".$code."\"}";
+
+//        echo  '<br/> ===============================<br />';
+//        var_dump($syscfg['AccessSet']);
+//        echo  '<br/> ===============================<br />';
+//        var_dump($ReqArguments);
+//        echo  '<br/> ===============================<br />';
+//
+//        if(0 < count($syscfg)){
+//            $Rt -> Client =  $client;
+//            $Rt -> message =  '测试消息返回';
+//            return  $Rt;
+//        }
+
+//        $sendSmsRequest = new SendSmsRequest([
+//                  "phoneNumbers" => $phone,
+//            "signName" => "沈北新区御享健康",
+//            "templateCode" => "SMS_495855539",
+//            "templateParam" => "{\"code\":\"".$code."\"}"
+//
+//        ]);
+        $sendSmsRequest = new SendSmsRequest($ReqArguments);
+
         $runtime = new RuntimeOptions([]);
         // true 忽略证书校验；false 设置证书校验
 		$runtime->ignoreSSL = true;

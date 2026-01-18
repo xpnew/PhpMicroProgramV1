@@ -1,5 +1,8 @@
 @echo off
 :: 说明：请先复制你的Git远程仓库地址（如：https://gitee.com/xxx/xxx.git），然后运行本脚本。
+SysConf::get('sms.aliyunkey1')
+
+
 
 echo 正在获取剪贴板中的Git地址...
 :: 1. 获取剪贴板内容并赋值给变量
