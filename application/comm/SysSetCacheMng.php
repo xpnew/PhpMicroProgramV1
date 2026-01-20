@@ -97,6 +97,17 @@ class SysSetCacheMng
         }
         return $val;
     }
+    //获取一个项的百分比结果
+
+    /** 获取一个项的百分比结果
+     * @param $key 配置项
+     * @param $def 默认值（70％填70）
+     * @return float
+     */
+    public  function GetPercentage($key, $def = 0.0){
+        $val =  $this -> GetDecimal($key, $def);
+        return $val * 0.01;
+    }
     public function GetInt($key, $def = 0){
         $val = $this -> GetSet($key);
         if(null == $val || '' == $val){

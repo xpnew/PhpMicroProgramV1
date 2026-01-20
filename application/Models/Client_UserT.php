@@ -123,7 +123,7 @@ class Client_UserT extends Model
 // Address varchar 地址    varchar(150)    YES
 // IDCard  varchar 身份证  varchar(150)    YES
 // BirthDay        varchar 生日    varchar(150)    YES
-// IsPromete       int     已经提权        int(11) YES
+// IsPromote       int     已经提权        int(11) YES
 // CreateTime      datetime        创建日期        datetime        YES
 // FirstLoginTime  datetime        首次登录日期    datetime        YES
 // IsDelFlag       int     删除标记        int(1)  YES

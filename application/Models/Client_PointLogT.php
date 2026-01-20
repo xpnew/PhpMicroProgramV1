@@ -5,9 +5,41 @@ use think\Model;
 
 
 
-/// 文件 名带下划线的 读取不到！！！
 
-
+/**
+ * 客户奖金记录表
+ * @package App\Models
+ * @table Client_PointLogT
+ *
+ * @property-read \Illuminate\Database\Eloquent\Builder|static where(string $column, mixed $value)
+ * @property integer $Id 主键
+ * @property integer $ClientUserId 用户Id
+ * @property string $ClientRealName 客户姓名
+ * @property string $ClientNickName 客户呢称
+ * @property string $ClientPhone 客户电话
+ * @property float $Points 积分（原始数据）
+ * @property float $TotalPrice 价格
+ * @property integer $OrderItemId 来源id
+ * @property integer $OrderId 订单号
+ * @property string $OrderNo 订单号
+ * @property string $CreateTime 创建时间
+ * @property float $Qty 数量
+ * @property integer $ProductId 商品Id
+ * @property string $ProductName 商品名称
+ * @property string $Rmk 备注
+ * @property integer $AssetTypeId 资产类型
+ * @property string $AssetTypeName 资产类型
+ * @property integer $AssetStatusId 资产状态
+ * @property string $AssetStatusName 资产状态
+ * @property bool $IsSuccess 是否已经成功
+ * @property string $UpdateTime 更新时间
+ * @property integer $AssetModeId 资产模式
+ * @property string $AssetModeName 资产模式
+ * @property bool $IsFrozen 是否处于冻结状态
+ * @property float $OldPoints 原来的积分
+ * @property float $ChangePoints 变动积分 可正可负
+ * @property float $NewPoints 新的积分 （不显示）调度代码用的
+ */
 class Client_PointLogT extends Model
 {
     protected $table = 'Client_PointLogT';
@@ -45,5 +77,3 @@ class Client_PointLogT extends Model
 // UpdateTime      datetime        更新时间        datetime        YES 
 
 ?>
-
-

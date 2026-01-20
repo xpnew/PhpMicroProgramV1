@@ -130,13 +130,13 @@
                     <div class="layui-inline">
                         <label class="layui-form-label">运单号</label>
                         <div class="layui-input-inline">
-                            <input type="text" name="TrackingNumber" lay-verify="required" autocomplete="off" class="layui-input" />
+                            <input type="text" name="TrackingNumber" lay-verify="TrackingNumber" autocomplete="off" class="layui-input" />
                         </div>
                     </div>
                     <div class="layui-inline">
                         <label class="layui-form-label">发货姓名</label>
                         <div class="layui-input-inline">
-                            <input type="text" name="ShippingName" lay-verify="required"  class="layui-input"/>
+                            <input type="text" name="ShippingName" class="layui-input"/>
                         </div>
                     </div>
 
@@ -145,6 +145,15 @@
                     <label class="layui-form-label">发货地址</label>
                     <div class="layui-input-block">
                         <textarea placeholder="" name="ShippingAddress" autocomplete="off" class="layui-textarea"></textarea>
+                    </div>
+                </div>                
+                <div class="layui-form-item  layui-form-text">
+                    <label class="layui-form-label">发送方式</label>
+                    <div class="layui-input-block">
+                        <div class="layui-form">
+                        <input type="radio" name="SaveType" value="1" title="保存备注">
+                        <input type="radio" name="SaveType" value="2" title="提交发货" checked> 
+                        </div>
                     </div>
                 </div>                
                 {else}
@@ -173,17 +182,44 @@
                     </div>
 
                 </div>
-
+                <div class="layui-form-item  layui-form-text">
+                    <label class="layui-form-label">发送方式</label>
+                    <div class="layui-input-block">
+                        <div class="layui-form">
+                        <input type="radio" name="SaveType" value="1" title="保存备注" checked>
+                        </div>
+                    </div>
+                </div>      
                 {/if}
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">备注(前台可见)</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" name="Remark" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">附注、说明（前台不可见）</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入附注、说明容" name="Comment" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+
                 <div class="layui-form-item">
                     <div class="layui-input-block">
 
                     {if( 10002000 == $Model -> OrderStatus)}
-                        <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">确认发货</button>
                         <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        <button type="button" class="layui-btn layui-btn-primary  layui-border-green"" onclick="bt_close()">关闭</button>
+
                     {else}
+                        <button class="layui-btn" lay-submit="" lay-filter="demo1">修改备注</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                     
                         <button type="button" class="layui-btn layui-btn-primary  layui-border-green"" onclick="bt_close()">关闭</button>
                     {/if}   
+
+                    
                     </div>
                 </div>
 
@@ -229,7 +265,16 @@
                         return '两次密码输入不一致';
                     }
                 }
+                ,
+                // 密码
+                TrackingNumber: function (value, item) {
+                    let SaveType = $('input[name="SaveType"]:checked').val();
+                    Debug('TrackingNumber', SaveType);
+                    if(2 == SaveType &&  CheckNull(value)){
+                        return '请填写物流单号';
 
+                    }
+                }
             });
 
 
@@ -292,6 +337,7 @@
 , "CreateTime": "{$Model->CreateTime|default=''}" // 创建时间
 , "UpdateTime": "{$Model->UpdateTime|default=''}" // 更新时间
 , "Remark": "{$Model->Remark|default=''}" // 备注
+, "Comment": "{$Model->Comment|default=''}" // 说明
 , "AuditUser": "{$Model->AuditUser|default=''}" // 审核人
 , "AuditTime": "{$Model->AuditTime|default=''}" // 审核时间
 , "AuditStatusId": "{$Model->AuditStatusId|default=''}" // 审核状态

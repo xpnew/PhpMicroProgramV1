@@ -13,12 +13,12 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
     public  $GroupDict =[];
 
 
-    public function __construct($orderId,$userId, $orderModel, $orderClass){
+    public function __construct($user, $orderModel, $orderClass){
 
 
 
 
-        parent::__construct($orderId,$userId,$orderModel,$orderClass);
+        parent::__construct($user,$orderModel,$orderClass);
 
         $this -> LoopMax =  99999999;
 
@@ -27,7 +27,16 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
     protected function _Init(){  //初始化
         parent :: _Init();
 
+        /// 用户确认收货时才生产 BuyTimes ，所以，即便是已经修改了用户的状态，这时也不会影响对新购买用户的判断
+        ///首次购买 按照 100% 计算
+        //if( null !=  $this -> OriginUserModel -> BuyTimes &&  0 < $this -> OriginUserModel -> BuyTimes){
 
+        //vip 用户会被认为是 复购
+        if( null != $this  -> OriginUserModel -> MakerLevelId  && 0 < $this  -> OriginUserModel -> MakerLevelId){
+            $Ratio =  $this -> CacheMng -> GetDecimal('RepeatPurchaseRatio',70);
+            $this -> RepeatPurchaseRatio =  $Ratio ;
+            $this -> BaseAmount =  $this-> OrderAmount * $Ratio  * 0.01;
+        }
 
 
     }
@@ -129,7 +138,7 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
             foreach ($Group -> BonusDict as $key2 => $value2) {
                 $CurrentItem = $value2;
                 if( $IsNeedSequential &&  $IsStart ){
-                    if(1  <  ($CurrentItem.GuiderLayerNum  - $LastItem.GuiderLayerNum  )){
+                    if(1  <  ($CurrentItem -> GuiderLayerNum  - $LastItem -> GuiderLayerNum  )){
                         break;
                     }
                 }

@@ -130,8 +130,8 @@ class PayNotice extends WxPayNotify
             if( $user ){
                /// $user -> HisMonetary += $order -> TotalPrice;
 //              $user -> BuyTimes += 1;
-                if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-                    $user -> IsPromete = 1;
+                if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+                    $user -> IsPromote = 1;
                 }
                 $user -> save();
             }
@@ -186,8 +186,8 @@ class PayNotice extends WxPayNotify
         // $order -> PayTime = date('Y-m-d H:i:s');
         // $user -> HisMonetary += $order -> TotalPrice;
         // $user -> BuyTimes += 1;
-        // if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-        //     $user -> IsPromete = 1;
+        // if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+        //     $user -> IsPromote = 1;
         // }
 
             $order -> PayStatus = 20005000;
@@ -201,8 +201,8 @@ class PayNotice extends WxPayNotify
             if( $user ){
                 $user -> HisMonetary += $order -> TotalPrice;
                 $user -> BuyTimes += 1;
-                if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-                    $user -> IsPromete = 1;
+                if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+                    $user -> IsPromote = 1;
                 }
                 $user -> save();
             }
@@ -290,8 +290,8 @@ class PayNotice extends WxPayNotify
             if( $user ){
                 $user -> HisMonetary += $order -> TotalPrice;
                 $user -> BuyTimes += 1;
-                if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-                    $user -> IsPromete = 1;
+                if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+                    $user -> IsPromote = 1;
                 }
                 $user -> save();
             }
@@ -346,8 +346,8 @@ class PayNotice extends WxPayNotify
         // $order -> PayTime = date('Y-m-d H:i:s');
         // $user -> HisMonetary += $order -> TotalPrice;
         // $user -> BuyTimes += 1;
-        // if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-        //     $user -> IsPromete = 1;
+        // if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+        //     $user -> IsPromote = 1;
         // }
 
             $order -> PayStatus = 20005000;
@@ -361,8 +361,8 @@ class PayNotice extends WxPayNotify
             if( $user ){
                 $user -> HisMonetary += $order -> TotalPrice;
                 $user -> BuyTimes += 1;
-                if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-                    $user -> IsPromete = 1;
+                if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+                    $user -> IsPromote = 1;
                 }
                 $user -> save();
             }

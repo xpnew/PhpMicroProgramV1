@@ -8,48 +8,92 @@ class BonusPool4Guider extends BonusPoolBase
 {
 
     public $BonusDict =[];
-    public function __construct($orderId,$userId, $orderModel, $orderClass){
 
-        $this->OrderId = $orderId;
+    //PreferredZonePool
+
+    /** @var array BonusAmountArr 优先区的奖金池 */
+    public $BonusAmountArr =[ 0,0];
+    public function __construct($user, $orderModel,$orderClass){
+
+//        $this->OrderId = $orderId;
 
 
 
-        parent::__construct($orderId,$userId,$orderModel,$orderClass);
+        parent::__construct($user, $orderModel,$orderClass);
 
     }
     protected function _Init(){  //初始化
         parent :: _Init();
-
+        //优选区 奖金计算复杂，需要逐个商品换算
+        $this -> _BuildBonus();
     }
+
+
 
     protected function _BuildBonus(){
+        $Items =  $this -> OrderModel -> Items;
+        if(null ==  $Items  || 0 ==  count($Items)){
+            $Items = \app\Models\Client_OrderItemT::where('', $this-> OrderId) -> select();
+            if(empty($Items)) {
+                $this->SayErrLog('程序出错了，计算奖金数额，无法获取订单明细。');
+                return;
+            }
+        }
+        $pro_ids = array_column($Items, 'ProductId');
+
+        $Pros =  \app\Models\Product_InfoT::where('ProductId', 'in', $pro_ids) -> select();
+
+        $DirectGuider = 0;
+        $IndirectGuider =0;
+//        $DirectGuiderRatio IndirectGuiderRatio
+        foreach($Items as $k => $entry){
+            $ProductId = $entry -> ProductId;
+            $FoundProduct = current(array_filter($Pros, function($pro) use ($ProductId) { return $pro['Id'] == $ProductId; }));
+
+            if(null ==  $FoundProduct)  continue;
+            if( !isset( $entry -> TotalPrice)){ continue;}
+
+            SetModel4Names($FoundProduct,['DirectGuiderRatio','IndirectGuiderRatio'],0);
+
+            $DirectGuider +=  $entry -> TotalPrice *  $FoundProduct -> DirectGuiderRatio * 0.01;
+            $IndirectGuider +=  $entry -> TotalPrice *  $FoundProduct -> IndirectGuiderRatio * 0.01;
+        }
 
 
-
+        $this->BonusAmountArr[0] = $DirectGuider;
+        $this->BonusAmountArr[1] = $IndirectGuider;
 
 
     }
 
+    protected  function Pushuser($user,$layerNum){
+
+        $NewBonusItem =  new BonusItem();
+        $NewBonusItem -> PoolMode =2;
+
+        $NewBonusLog =  BonusMng::getIns() -> MkBonusLog($user, $this->OrderModel);
+        $NewBonusItem -> UserModel =  $user;
+        $NewBonusItem -> BonusLogModel = $NewBonusLog;
+        $NewBonusItem -> GuiderLayerNum =  $layerNum;
+        $NewBonusItem -> UserId = $user -> Id;
+
+        $this -> BonusDict[$user -> Id] = $NewBonusItem;
+
+        $this -> GuilerModelArr[] = $user;
+    }
     protected  function  LoopGuider($userId){
 
             $NewUser =  \app\Models\Client_User_View::get($userId);
-            if(null == $NewUser){
+            if(null === $NewUser){
                 return;
             }
-            $NewBonusItem =  new BonusItem();
-            $NewBonusItem -> PoolMode =2;
+            $NewLayerNum =  $this -> GetLayerNum();
+            //金牌以上才会参加奖励
+            if($NewUser -> MakerLevelId > 2){
 
-            $NewBonusLog =  BonusMng::getIns() -> MkBonusLog($NewUser, $this->OrderModel);
-            $NewBonusItem -> UserModel =  $NewUser;
-            $NewBonusItem -> BonusLogModel = $NewBonusLog;
-            $NewBonusItem -> GuiderLayerNum =  $this -> GetLayerNum();
-            $NewBonusItem -> UserId = $userId;
-
-            $this -> BonusDict[$NewUser -> Id] = $NewBonusItem;
-
-            $this -> GuilerModelArr[] = $NewUser;
-
-            $this -> LoopStep ++;
+                $this -> Pushuser($NewUser, $NewLayerNum);
+                $this -> LoopStep ++;
+            }
 
             if( $this -> LoopStep >=  $this -> LoopMax){
                 return;
@@ -88,10 +132,14 @@ class BonusPool4Guider extends BonusPoolBase
 //            echo "Key: $key, Value: ";
             // 处理$value
             $Level = $i +1;
-            $Ratio = $this -> CacheMng -> GetDecimal('GuiderBonusLevel'.$Level.'Ratio',10.0);
-
-            $Ratio = floatval($Ratio) * 0.01;
-            $BonusAmount = $this -> BaseAmount * $Ratio ;
+//            $Ratio = $this -> CacheMng -> GetDecimal('GuiderBonusLevel'.$Level.'Ratio',10.0);
+//
+//            $Ratio = floatval($Ratio) * 0.01;
+//            $BonusAmount = $this -> BaseAmount * $Ratio ;
+            $BonusAmount = 0.0;
+            if(2 > $i){
+                $BonusAmount =  $this -> BonusAmountArr[$i];
+            }
             $BonusLog =  $value -> BonusLogModel ;
             $BonusLog -> Bonus = $BonusAmount;
             $BonusLog -> ChangeBonus = $BonusAmount;
@@ -125,7 +173,6 @@ class BonusPool4Guider extends BonusPoolBase
         $lst =  $this -> BonusItems;
         foreach($lst as $it){
             // $it['OrderId']  = $OrderId;
-
             $it -> save();
             // $dbitem -> save($it);
         }

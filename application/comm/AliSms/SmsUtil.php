@@ -81,13 +81,6 @@ class SmsUtil{
 //            return  $Rt;
 //        }
 
-//        $sendSmsRequest = new SendSmsRequest([
-//                  "phoneNumbers" => $phone,
-//            "signName" => "沈北新区御享健康",
-//            "templateCode" => "SMS_495855539",
-//            "templateParam" => "{\"code\":\"".$code."\"}"
-//
-//        ]);
         $sendSmsRequest = new SendSmsRequest($ReqArguments);
 
         $runtime = new RuntimeOptions([]);

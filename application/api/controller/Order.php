@@ -10,11 +10,24 @@ use \app\Models\Client_OrderT;
 use \app\Models\Client_BuyCarItemT;
 use \app\Models\Product_InfoT;
 use \app\Models\Client_UserT;
-use \app\Models\Clinet_BonusLogT;
+use \app\Models\Client_BonusLogT;
 use \app\utils\GeneralTool;
+use \app\Models\Client_UserT as UserDB;
+
 
 class Order extends ApiBase
 {
+
+    /** @var Client_UserT $CurrentUser 当前工作中使用的用户信息 */
+    protected  $CurrentUser ;
+    /** @var Client_OrderT $CurrentOrder 当前工作中使用的订单 */
+    protected  $CurrentOrder;
+
+
+
+
+
+
     /**
      * 显示资源列表
      *
@@ -24,6 +37,7 @@ class Order extends ApiBase
     {
         //
     }
+
 
 
     public function query(){ 
@@ -78,7 +92,8 @@ class Order extends ApiBase
 
     }
 
-
+    public  const IS_NOT_REPURCHASE = 0; // 非复购
+    public  const IS_REPURCHASE = 1;     // 是复购
     /**
      * 显示创建资源表单页.
      *
@@ -104,31 +119,63 @@ class Order extends ApiBase
 
         
         $prodb = new Product_InfoT();
-        
+
+        //2026年1月19日  新增复购买1赠1
+        /** @var int $IsRepurchase 复购的标志 */ $IsRepurchase  =  -1;
+        /** @var int $IsPointBuyClass 积分购买分类标志 */ $IsPointBuyClass  =  0;
+
+        $ExistUser =  \app\Models\Client_UserT::get($UserId);
+        if(0 < $ExistUser -> MakerLevelId){
+            $IsRepurchase  = 1;
+        }
         $ItemList =[];
+        $TotalPoint = 0;
         $TotalPrice = 0;
         $TotalQty = 0;
-        $ClassId4SameJudeg  = -1; // 同类别Id检查
+        $ClassId4SameJudge  = -1; // 同类别Id检查
         $ProductClass  = null;
         foreach($Items as $it){
             $product = $prodb -> where('Id',$it['ProductId']) -> find();
             if($product == null){
                 return $this->SendJErr('商品不存在' . $it['ProductId'] . ' '. $it['ProductName']);
             }
-            if(-1  != $ClassId4SameJudeg   &&  $product -> ClassId != $ClassId4SameJudeg){
+            if(-1  != $ClassId4SameJudge   &&  $product -> ClassId != $ClassId4SameJudge){
                 return $this->SendJErr('只允许同类商品一起购买');
             }
             if( null == $ProductClass)
+            {
                 $ProductClass =  \app\Models\Product_ClassT::get($product -> ClassId);
-            $ClassId4SameJudeg = $product -> ClassId;
+                if($ProductClass != null && 1 ==  $ProductClass -> EnablePointBuy){
+                    $IsPointBuyClass =  1;
+                }
+            }
+
+            $ClassId4SameJudge = $product -> ClassId;
+
+            //提前处理 有一些字段可能为空的情况。
+            SetModel4Names($product,['UnitPrice','SellPoints'],0);
+
             $Item = new Client_OrderItemT();
+
+            SetModel4Names($Item,['UnitPrice','UnitPoint'],0);
+
+
             $Item -> OrderId = 0; // 还没有订单ID
             $Item -> OrderNo = $NewOrder['OrderNo'];
             $Item -> ProductId = $it['ProductId'];
             $Item -> ProductName = $it['ProductName'];
             $Item -> UnitPrice = $it['UnitPrice'];
+            if( null == $it['Qty'] || !isset($it['Qty'] ) || !is_int($it['Qty'])  ){
+                return $this->SendJErr('商品数量异常（'.$it['ProductId'] . ' '. $it['ProductName']. '）');
+            }
             $Item -> Qty = $it['Qty'];
+//            FillVariate($it['Qty'],0);
+            if(1 ==  $IsPointBuyClass)
+                $Item -> UnitPoint  = $product-> SellPoints;
+            $Item -> TotalPoint  = $Item -> UnitPoint * $it['Qty'];
+
             $Item -> TotalPrice = $it['UnitPrice'] * $it['Qty'];
+
             $Item -> ProductPic = $product-> ProductPic;
             $Item -> Summary = $product-> Summary  .' ClassId: ' . $product-> ClassId;
             $Item -> ProductClassId = $product-> ClassId;
@@ -136,8 +183,14 @@ class Order extends ApiBase
             // $Item -> ProductClassId = $ProductClass-> Id;
             $Item -> LineRmk =  '购买商品：' .  $it['ProductName'] . '' . $it['UnitPrice'] . ' x ' . $it['Qty']   . ' = ' . $Item -> TotalPrice ;
             // $Item -> CreateTime = date('Y-m-d H:i:s');
+
+            if( 1 ==  $IsRepurchase ){
+                $Item -> Qty = $it['Qty'] * 2;
+            }
+
             $ItemList[] = $Item;
             $TotalPrice += $Item -> TotalPrice;
+            $TotalPoint += $Item -> TotalPoint;
             $TotalQty += $it['Qty'];
             // $NewItem = [
             //     'OrderId' => 0,
@@ -154,19 +207,21 @@ class Order extends ApiBase
             
         }
         $NewOrder['TotalPrice'] = $TotalPrice;
+        $NewOrder['TotalPoint'] = $TotalPoint;
         $NewOrder['PayPrice'] = $TotalPrice;
         $NewOrder['TotalQty'] = $TotalQty;
+        $NewOrder['IsRepurchase'] = $IsRepurchase;
 
         $this -> SayLog('New Order:'.json_encode($NewOrder));
         $this -> SayLog('New Items:'.json_encode($ItemList));
 
         $db -> save($NewOrder);
         $OrderId = $db -> Id;
-        $buycar = new Client_BuyCarItemT();
+        $BuyCarProvider = new Client_BuyCarItemT();
         foreach($ItemList as $it){
             // $it['OrderId']  = $OrderId;
             $it -> OrderId = $OrderId;
-            $buycar -> where('UserId',$UserId) ->where('ProductId',$it -> ProductId) -> delete();
+            $BuyCarProvider -> where('UserId',$UserId) ->where('ProductId',$it -> ProductId) -> delete();
             $it -> save();
             // $dbitem -> save($it);
         }
@@ -180,6 +235,8 @@ class Order extends ApiBase
     }
 
 
+    protected  $IsPreferredZone;
+    protected  $CurrentProductClass;
 
     public function TestPayOrder(){
         $OrderId = \think\facade\Request::param('OrderId',0);
@@ -198,9 +255,34 @@ class Order extends ApiBase
         if($order == null){
             return $this->SendJErr('订单不存在');
         }
+        $this -> CurrentOrder = $order;
+
         if($order -> OrderStatus != 10001000){
             return $this->SendJErr('订单状态不正确，不能支付');
         }
+        $ExistUser =  Client_UserT::get($UserId );
+        $this-> CurrentUser = $ExistUser;
+
+        if(!$ExistUser){
+            return $this->SendJErr('用户不存在');
+        }
+        $dbitems =  Client_OrderItemT:: where('OrderId', $OrderId) -> select();
+
+        $order -> Items = $dbitems;
+        if( !isset($this -> CurrentProductClass)){
+            $this -> CurrentProductClass = $this -> GetProductClass();
+        }
+        if( !isset($this -> IsPreferredZone)){
+            $this -> IsPreferredZone = $this -> GetIsPreferredZone();
+        }
+
+
+        $ConsumptionPoints  = $this -> BuildConsumptionPoints();
+
+        if($this -> HasError){
+            return  $this->SendJMsg();
+        }
+
 
         $order -> UpdateTime = date('Y-m-d H:i:s');
         // $order -> PayTime = date('Y-m-d H:i:s');
@@ -214,6 +296,9 @@ class Order extends ApiBase
         $order -> OrderStatus = 10005000;
         $order -> save();
 
+        if(null != $ConsumptionPoints){
+            $ConsumptionPoints -> save();
+        }
 
 
         $CacheMng =  \app\Comm\SysSetCacheMng::getInstance();
@@ -224,22 +309,12 @@ class Order extends ApiBase
         // if($user == null){
         //     return $this->SendJErr('用户不存在');
         // }
-        $ExistUser =  Client_UserT::get($UserId );
-        if(!$ExistUser){
-            return $this->SendJErr('用户不存在');
-        }
-        
-        
-        if(null ==  $ExistUser -> RealityName){
 
-            if( $CacheMng -> GetDecimal('MakerLevel1Require',398) <= $order -> PayPrice){
-                $ExistUser -> MakerLevelId  =1;
-                if( $CacheMng -> GetDecimal('MakerLevel2Require',398) <= $order -> PayPrice){
-                     $ExistUser -> MakerLevelId  =2;
-                }
-                $ExistUser -> save();
-            }
-        }
+
+
+
+
+        $ExistUser -> save();
 
         $InputModel = $this->request->post();
 
@@ -256,29 +331,31 @@ class Order extends ApiBase
         $InputModel['ClientNickName'] =   $ExistUser-> NickName;
         $InputModel['ClientPhone'] =   $ExistUser-> Mobile ;
         $InputModel['ClientUserId'] = $UserId;
-        //生成积分
+
+        if(! $this -> IsPointBuy  && ! $this -> IsPreferredZone){
+            //生成积分
+            $PointLog  =  array_values($InputModel);
 
 
-        $PointLog  =  array_values($InputModel);
-    
+            $PointLog['CreateTime'] = date('Y-m-d H:i:s');
 
-        $PointLog['CreateTime'] = date('Y-m-d H:i:s');
+            $PointLog['Points'] = $order -> PayPrice * $CacheMng -> GetDecimal('ProductPointRatio',100) * 0.01;
 
-        $PointLog['Points'] = $order -> PayPrice * $CacheMng -> GetDecimal('ProductPointRatio',100) * 0.01;
+            $PointLog['AssetModeId'] =90007000;
+            $PointLog['AssetTypeId'] =80007000;
+            $PointLog['AssetStatusId'] =81002000;
+            $PointLog['ChangePoints'] = $PointLog['Points'];
+            $DB4PointLog= new \app\Models\Client_PointLogT();
+            $this -> SayLog('积分操作： ' , $PointLog);
+            $DB4PointLog->save($PointLog);
+        }
 
-        $PointLog['AssetModeId'] =90007000;
-        $PointLog['AssetTypeId'] =80007000;
-        $PointLog['AssetStatusId'] =81002000;
-        $PointLog['ChangePoints'] = $PointLog['Points'];
-        $DB4PointLog= new \app\Models\Client_PointLogT();
-        $this -> SayLog('积分操作： ' , $PointLog);
-        $DB4PointLog->save($PointLog);
 
         //生成奖金
 
         $BM  = BonusMng::getInstance();
 
-        $poor =  $BM -> BuildPool($OrderId,$UserId);
+        $poor =  $BM -> BuildPool4Id($OrderId,$UserId);
         $this -> SayLog('奖金池处理： ' , $poor);
 
         //生成见单奖
@@ -312,7 +389,7 @@ class Order extends ApiBase
 
         // $DB4BonusLog= new \app\Models\Client_BonusLogT();
         // $this -> SayLog('见单奖： ' , $AreaMaster);
-        // $DB4BonusLog->save($DB4BonusLog);
+        // $DB4BonusLog->save($AreaMaster);
 
 
 
@@ -331,6 +408,10 @@ class Order extends ApiBase
         return $this->SendJErr('支付成功');
 
     }
+
+    /** 用户发送支付
+     * @return \think\response\Json
+     */
     public function SendPay(){
         $OrderId = \think\facade\Request::param('OrderId',0);
         $UserId =  \think\facade\Request::param('UserId',0);
@@ -374,8 +455,8 @@ class Order extends ApiBase
         }
         // $user -> HisMonetary += $order -> TotalPrice;
         // $user -> BuyTimes += 1;
-        // if(0 == $user -> IsPromete|| !isset($user -> IsPromete)){
-        //     $user -> IsPromete = 1;
+        // if(0 == $user -> IsPromote|| !isset($user -> IsPromote)){
+        //     $user -> IsPromote = 1;
         // }
         $user -> save();
         $this -> SayLog('User:'.json_encode($user));
@@ -393,6 +474,115 @@ class Order extends ApiBase
 
     }
 
+
+    /**
+     * 用户消费积分来支付订单，只是生成数据并没有保存
+     * @param $user
+     * @param $order
+     * @return \app\Models\Client_PointLogT
+     */
+    protected  function BuildConsumptionPoints( ){
+        $order =  $this -> CurrentOrder;
+        $user = $this -> CurrentUser;
+        if(0 < $order -> TotalPoint){
+            $this -> IsPointBuy = true;
+        }
+
+        if(null ==  $user -> PointsBalance  || 0 ==  $user -> PointsBalance){
+            $this -> _SetFail('用户没有积分不能支付积分消费的订单');
+            return  null;
+        }
+
+        if($user -> PointsBalance  < $order -> TotalPoint){
+            $this -> _SetFail('用户积分不足，无法完成交易');
+            return  null;
+        }
+        SetModel4Names($user,['PointsHistory', 'PointsBalance','PointsFrozen'],0);
+
+
+
+        $ProductNames = array_column($order->Items, 'ProductName');
+        $ResultString = implode(',', $ProductNames);
+        $Rmk = mb_substr('订单商品：' . $ResultString, 0, 255, 'UTF-8');
+
+        $NewPoint =  new \app\Models\Client_PointLogT();
+
+        $NewPoint -> ClientUserId = $order -> UserId;
+        $NewPoint -> ClientRealName = $user -> RealityName;
+        $NewPoint -> ClientNickName = $user -> NickName;
+        $NewPoint -> ClientPhone = $user -> Mobile;
+
+        $NewPoint -> Qty = $order -> TotalQty;
+        $NewPoint -> Points = $order -> TotalPoint;
+
+
+        $NewPoint -> ChangePoints = $order -> TotalPoint *-1;
+        $NewPoint -> OldPoints = $user -> PointsBalance;
+        $NewPoint -> NewPoints = $user -> PointsBalance + $NewPoint -> ChangePoints;
+
+        $NewPoint -> AssetModeId =90007500;
+        $NewPoint -> AssetModeName = '商城消费积分';
+        $NewPoint -> AssetTypeId =80007000;
+        $NewPoint -> AssetTypeName = '积分';
+        $NewPoint -> AssetStatusId =81002000;
+        $NewPoint -> AssetStatusName = '等待&冻结';
+
+
+
+        $NewPoint -> CreateTime = date('Y-m-d H:i:s');
+        $NewPoint -> IsFrozen = true;
+        $NewPoint -> IsSuccess = 1;
+        $NewPoint -> Rmk = $Rmk ;
+
+        $user -> PointsBalance =  $NewPoint -> NewPoints;
+        $user -> PointsHistory += $NewPoint -> Points;
+        $user -> PointsFrozen += $NewPoint -> Points;
+//        $user -> Save();
+
+
+        return $NewPoint;
+
+    }
+
+    protected function GetIsPreferredZone($orderitem = null){
+        $Class =  null;
+        if(null == $orderitem -> IsPreferredZone){
+
+            $Class = $this -> CurrentProductClass;
+        }else{
+            $ClassId =  $orderitem -> ProductClassId;
+            $Class =  \app\Models\Product_ClassT::get($ClassId);
+            if($Class == null){
+                return false;
+            }
+        }
+
+        if(40002000 == $Class -> ProductZoneId){
+            return true;
+        }
+        return  false;
+
+    }
+
+    public function GetProductClass($orderitem){
+
+        if(null  ==  $orderitem){
+            if(null ==  $this -> CurrentOrder  || null ==  $this -> CurrentOrder -> Items || 0 ==  count( $this -> CurrentOrder -> Items)){
+                throw new \Exception('数据错误找不到商品分类');
+            }
+            $orderitem =  $this -> CurrentOrder -> Items[0];
+        }
+
+        $ClassId =  $orderitem -> ProductClassId;
+        $Class =  \app\Models\Product_ClassT::get($ClassId);
+        if($Class == null){
+            throw new \Exception('数据错误找不到商品分类');
+            return false;
+        }
+
+        return   $Class;
+    }
+    protected  $IsPointBuy =  false;
 
 
 
@@ -497,7 +687,7 @@ class Order extends ApiBase
         if($puser == null){
             return;
         }
-        if( $puser -> IsPromete != 1){
+        if( $puser -> IsPromote != 1){
             $this -> StatisticsGuider($puser -> GuiderUserId,$price,$level+1);
             return;
         }
@@ -521,10 +711,10 @@ class Order extends ApiBase
         $puser -> GuiderBonus += $money;
         $puser -> save();
 
-        // $dblog =  new \app\Models\Clinet_BonusLogT();
+        // $dblog =  new \app\Models\Client_BonusLogT();
 
         // 记录日志
-        $log = new \app\Models\Clinet_BonusLogT();
+        $log = new \app\Models\Client_BonusLogT();
         $log -> UserId = $puser -> Id;
         $log -> UserName = $puser -> NickName;
         $log -> Bonus = $money;
@@ -548,8 +738,8 @@ class Order extends ApiBase
 
 
 
-    /// 确认收货
-     public function SendArrival(){
+    // 确认收货
+    public function SendArrival(){
         $OrderId = \think\facade\Request::param('OrderId',0);
         $UserId =  \think\facade\Request::param('UserId',0);
         
@@ -566,18 +756,40 @@ class Order extends ApiBase
         if($order -> OrderStatus != 10003000){
             return $this->SendJErr('订单状态不正确，不能 确认收货 ' . $order -> OrderStatus);
         }
+
+
+
         //    'OrderStatus' => 10001000, //10001000 未完成 ;10005000 已经完成  etc.
         //     'PayStatus' => 20001000, //20001000 未付款;20002000 付款中;20004000 已经取消;20005000 付款成功;20005500 退款;20009000 支付失败
         //     'DeliveryStatus' => 70001000,//70001000 未发货;70002000 已发货;70004000 已到货;70005000 已签收;70006000 已取消         
         // 模拟支付成功
+        $ExistUser = UserDB::get($UserId);
 
+         if( $this -> _CacheMng -> GetDecimal('MakerLevel3Require',19900) <= $order -> PayPrice){
+
+             if(null ==  $ExistUser -> MakerLevelId || 3  >$ExistUser -> MakerLevelId ) {
+                 $ExistUser -> MakerLevelId  =3;
+             }
+
+         }else if($this -> _CacheMng-> GetDecimal('MakerLevel2Require',3980) <= $order -> PayPrice){
+             if(null ==  $ExistUser -> MakerLevelId || 2  >$ExistUser -> MakerLevelId ) {
+                 $ExistUser -> MakerLevelId  =2;
+             }
+
+         }else if ($this -> _CacheMng -> GetDecimal('MakerLevel2Require',398) <= $order -> PayPrice){
+             if(null ==  $ExistUser -> MakerLevelId ||  0 == $ExistUser -> MakerLevelId ) {
+                 $ExistUser -> MakerLevelId  =1;
+             }
+         }
+         $ExistUser -> save();
         $order -> OrderStatus = 10005000;
         $order -> UpdateTime = date('Y-m-d H:i:s');
         $order -> ArrivalTime = date('Y-m-d H:i:s');
 
         $order -> save();
+         $ExistUser -> save();
         // 统计订单
-        $this -> StatisticsOrder($order,$user);
+        $this -> StatisticsOrder($order,$ExistUser);
         return $this->SendJOk('确认收货');
 
     }

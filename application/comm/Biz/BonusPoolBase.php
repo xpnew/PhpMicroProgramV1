@@ -6,6 +6,9 @@ namespace app\comm\Biz;
 
 
 
+use think\facade\Log;
+use think\facade\Route;
+
 abstract class BonusPoolBase extends \app\Comm\CommMsg
 {
 
@@ -19,9 +22,9 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
 
     //区县代理奖金
     public  $RegionAgentBounsItems = array();
-
+    /** @var \app\Models\Client_OrderT $OrderModel 相关订单 */
     public  $OrderModel = null;
-
+    /** @var \app\Models\Client_UserT $OriginUserModel 消费用户 */
     public  $OriginUserModel = null ;
 
     public  $OrderId;
@@ -50,19 +53,19 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
 
     protected  $LoopMax =  2;
     protected  $LoopStep = 0;
-    public function __construct($orderId,$userId, $orderModel,$orderClass){
+    public function __construct($user, $orderModel,$orderClass){
         parent::__construct();
 
-        if( null ==  $orderId &&  null ==  $userId ){
-            return false;
-        }
-        $this->OrderId = $orderId;
 
-        $this -> OriginUserId = $userId;
+
 //        $this->OrderAmount = $orderAmount;
         $this->OrderModel = $orderModel;
         $this->OrderClass = $orderClass;
+        $this -> OriginUserModel = $user;
 
+        $this->OrderId = $this->OrderModel ->Id;
+
+        $this -> OriginUserId = $user ->Id;
 
         $this -> CacheMng =  \app\Comm\SysSetCacheMng::getInstance();
 
@@ -74,7 +77,7 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
 
 
     protected function _Init(){
-         $this -> RootUserId  = $this->CacheMng ->GetSet('');
+         $this -> RootUserId  = $this->CacheMng ->GetSet('RootGuiderUserId');
         if('' != $this -> RootUserId){
             $this -> RootUserId = null;
         }
@@ -82,29 +85,30 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
             $this -> OrderModel = \app\Models\Client_OrderT::get($this->OrderId);
         }
         $this  -> OrderAmount = $this -> OrderModel -> PayPrice;
-        $this -> OriginUserModel =  \app\Models\Client_User_View::get($this -> OriginUserId);
-        /// 用户确认收货时才生产 BuyTimes ，所以，即便是已经修改了用户的状态，这时也不会影响对新购买用户的判断
-        ///首次购买 按照 100% 计算
-        if( null !=  $this -> OriginUserModel -> BuyTimes &&  0 < $this -> OriginUserModel -> BuyTimes){
 
-            $Ratio =  $this -> CacheMng -> GetSet('RepeatPurchaseRatio');
-            if(null == $Ratio  || !isset($Ratio)  || '' == $Ratio  ){
+        $this -> BaseAmount =  $this-> OrderAmount  ;
 
-                $Ratio =  '70';
-            }
-            $Ratio = floatval($Ratio) * 0.01;
-            $this -> RepeatPurchaseRatio =  $Ratio ;
-            $this -> BaseAmount =  $this-> OrderAmount * $Ratio ;
 
-        }else{
-            $this -> BaseAmount =  $this-> OrderAmount  ;
-        }
+
 
     }
 
     protected  function GetLayerNum(){
         $this -> LayerNum  = $this -> LayerNum + 1;
         return $this -> LayerNum;
+    }
+
+    protected  function SayErrLog($title,$model,$ex){
+        $pathinfo = $this->request->pathinfo(); // 获取当前请求的pathinfo
+        // $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
+        $current =  Route:: getCurrentRule();
+        Log::error('程序出错：' . $title . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
+        if(null != $model ){
+            Log::record('模型数据：\n'  . json_encode($model)   );
+        }
+        if(null != $ex){
+            Log::record('异常信息：\n'  . json_encode($ex)   );
+        }
     }
 
     abstract protected function  LoopGuider($GuiderId);

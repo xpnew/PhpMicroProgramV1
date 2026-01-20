@@ -6,6 +6,7 @@ class TokenItem
 {
     public $UserId = 0;
     public $UserName = "";
+    public $NickName = "";
     public $RealName = "";
     public $Mobile = "";
     public $OpenId = "";

@@ -165,6 +165,21 @@ class Order extends AdminBase
         if(!$ExistOrder){
             return $this->SendJErr('参数错误 订单不存在');
         }
+
+        if(1 ==  $InputModel['SaveType']){
+            $ExistOrder['Remark'] =  $InputModel['Remark'];
+            $ExistOrder['Comment'] =  $InputModel['Comment'];
+            $ExistOrder["UpdateTime"]   =  date('Y-m-d H:i:s');
+            $ExistOrder -> save();
+            return $this->SendJOk('修改备注成功！');
+        }
+
+
+        if(null == $InputModel['TrackingNumber'] || ! isset($InputModel['TrackingNumber'])){
+            return $this->SendJErr('请输入运单号');
+        }
+
+
         $this-> SayLog(' admin order save ExistOrder： ' , $ExistOrder);
         if( 10002000 !=  $ExistOrder['OrderStatus']){
             return $this->SendJErr('参数错误 订单状态不允许修改');
@@ -173,6 +188,7 @@ class Order extends AdminBase
         $InputModel["UpdateTime"]   =  date('Y-m-d H:i:s');
         $InputModel["OrderStatus"] =  10003000;
         $InputModel["ShipingTime"] =  date('Y-m-d H:i:s');
+
 
 
 

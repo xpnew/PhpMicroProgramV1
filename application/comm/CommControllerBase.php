@@ -14,15 +14,30 @@ class CommControllerBase extends Controller
     protected $QMsg;
 
     public $RecordCount ;
+
+
+    /** @var bool $HasError 已经存在错误标志 */
+    public $HasError =  false;
+
+    /** @var array $ErrorList 错误消息列表，一般只用来处理整批数据的时候使用，平常都是用 NoticeStr*/
+    public $ErrorList = [];
+    /** @var string $NoticeStr 页面通知消息，错误消息内容 */
+    public $NoticeStr  = '';
+
+
+
+    /** @var \app\Comm\SysSetCacheMng $_CacheMng 缓存管理实例 */
+    protected $_CacheMng = null;
     protected function initialize()
     {
-
+        parent::initialize();
 
         $this -> QMsg = new QueryMsg();
         $this -> Msg = new CommMsg();
-        
 
+        $this -> _CacheMng =  \app\Comm\SysSetCacheMng::getInstance();
     }
+
 
 
 
@@ -53,17 +68,37 @@ class CommControllerBase extends Controller
 
         $pathinfo = $this->request->pathinfo(); // 获取当前请求的pathinfo
         // $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
-        $$current =  Route:: getCurrentRule();
+        $current =  Route:: getCurrentRule();
 
 
         Log::record('程序出错' . $title . ' ex=' . json_encode($ex) . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
         // Log::error('程序出错' . $title . ' ex=' . json_encode($ex)   . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current));
 
-        LogError($title ,$model, $ex );
+        LogError($title ,$data, $ex );
         
         return json($this->QMsg);
     }
 
+
+    /** 内部打包处理，出错现了错误，准备退出程序
+     * @param string $errorMsg 错误消息的内容
+     * @return void
+     */
+    protected  function _SetFail($errorMsg){
+        $this -> HasError = true;
+        $this -> ErrorList[] = $errorMsg;
+        $this -> NoticeStr = $errorMsg;
+
+        $this -> QMsg -> msg = $this -> NoticeStr;
+        $this->Msg->SetErr($errorMsg,-1 ,   null, null);
+    }
+
+    /** 发送Json消息
+     * @return \think\response\Json
+     */
+    protected  function SendJMsg(){
+        return json($this->Msg);
+    }
     protected function SendJOk($title,$code =1, $data = array())
     {
         $this->Msg->SetOk($title, $code,   $data);

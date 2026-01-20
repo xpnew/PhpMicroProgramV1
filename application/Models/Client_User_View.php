@@ -4,7 +4,18 @@ namespace app\Models;
 use think\Model;
 
 
-class Client_User_View extends Model
+/**
+ * VIEW
+ * @package App\Models
+ * @table client_user_view
+ * @see Client_UserT
+ *
+ * @property-read \Illuminate\Database\Eloquent\Builder|static where(string $column, mixed $value)
+ * @property string $MarketingLevelName 级组名称
+ * @property string $GuiderRealName 实名
+ * @property string $GuiderNickName 呢称
+ */
+class Client_User_View extends  Client_UserT
 {
     protected $table = 'client_user_view';
     protected $pk = 'Id';
@@ -55,7 +66,7 @@ class Client_User_View extends Model
 // Address varchar 地址    varchar(150)    YES
 // IDCard  varchar 身份证  varchar(150)    YES
 // BirthDay        varchar 生日    varchar(150)    YES
-// IsPromete       int     已经提权        int(11) YES
+// IsPromote       int     已经提权        int(11) YES
 // CreateTime      datetime        创建日期        datetime        YES
 // FirstLoginTime  datetime        首次登录日期    datetime        YES
 // IsDelFlag       int     删除标记        int(1)  YES
