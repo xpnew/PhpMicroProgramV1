@@ -111,6 +111,27 @@ class TestArray01
         echo $Amount;
     }
 
+    public  function  test06    ()
+    {
+
+        $user =  \app\Models\Client_UserT::get(89);
+
+        echo '<br /> ===================<br/>';
+        echo $user-> PointsBalance;
+
+        echo '<br /> ===================<br/>';
+        var_dump($user);
+        echo '<br /> ===================<br/>';
+        echo $user-> PointsBalance;
+
+        echo '<br /> ===================<br/>';
+
+        SetModel4Names($user,['PointsHistory', 'PointsBalance','PointsFrozen'],0);
+        echo '<br /> ===================<br/>';
+        var_dump($user);
+
+    }
+
 
     function FillArr($target,$def){
         foreach ($target as $k => &$v) {

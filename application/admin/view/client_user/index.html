@@ -38,7 +38,7 @@
                                 <div class="layui-input-inline">
                                     <select name="MakerLevelId" id="MakerLevelId" class="layui-select">
                                         <option value="">请选择</option>
-                                            {foreach $MakeingLvList as $key=>$vo } 
+                                            {foreach MakingLvList as $key=>$vo }
                                                 <option value="{$vo.Id}">{$vo.LevelName}</option>
                                             {/foreach}           
                                     </select>
@@ -197,7 +197,7 @@
                 var NickName = $("input[name='NickName']").val();
                 var RealityName = $("input[name='RealityName']").val();
                 var Mobile = $("input[name='Mobile']").val();
-                var MakerLevel = $("input[name='MakerLevel']").val();
+                var MakerLevelId = $('MakerLevelId').val();
 
 
                 table.reload('currentTableId', {
@@ -209,7 +209,7 @@
                         'NickName': NickName,
                         'Mobile': Mobile,
                         'RealityName': RealityName,
-                        'MakerLevel': MakerLevel,                       
+                        'MakerLevelId': MakerLevelId,
                     }
                 }, 'data');
                 return false;

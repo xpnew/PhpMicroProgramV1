@@ -12,10 +12,10 @@ use \app\Models\Client_UserT;
 use \app\Models\Biz_PayBillT;
 use \app\utils\GeneralTool;
 
-use app\comm\WxPay\WxPayConfig;
-use app\comm\WxPay\WxPayApi;
-use app\comm\WxPay\WxPayUnifiedOrder;
-use app\comm\WxPay\WxPayResults;
+use app\Comm\WxPay\WxPayConfig;
+use app\Comm\WxPay\WxPayApi;
+use app\Comm\WxPay\WxPayUnifiedOrder;
+use app\Comm\WxPay\WxPayResults;
 
 require_once  __DIR__ . "/../../Comm/WxPay/WxPay.Api.php";
 require_once  __DIR__ . "/../../Comm/WxPay/WxPay.Config.php";

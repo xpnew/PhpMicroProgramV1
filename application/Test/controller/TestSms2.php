@@ -1,8 +1,8 @@
 <?php
 namespace app\test\controller;
 use think\Controller;
-use app\comm\CommControllerBase;
-use app\comm\AliSms\SmsCodeMng;
+use app\Comm\CommControllerBase;
+use app\Comm\AliSms\SmsCodeMng;
 
 
 use AlibabaCloud\SDK\Dysmsapi\V20170525\Dysmsapi;

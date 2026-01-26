@@ -1,6 +1,6 @@
 <?php
 
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 
 
 
@@ -18,7 +18,7 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
 
 
 
-        parent::__construct($user,$orderModel,$orderClass);
+        parent::__construct($user,$orderModel,$orderClass,false);
 
         $this -> LoopMax =  99999999;
 

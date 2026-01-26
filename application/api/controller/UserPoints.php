@@ -101,7 +101,7 @@ class UserPoints extends ApiBase
         if($AmountFee <= 0){
             return $this->SendJErr('提现金额必须大于0');
         }
-        $mng =  \app\comm\SysSetCacheMng::getIns();
+        $mng =  \app\Comm\SysSetCacheMng::getIns();
         $WithdrawMin =  (int)$mng -> GetSet('WithdrawMin'); // 最小提现金额 这个按元 单位
 
         if($AmountFee < $WithdrawMin * 100){

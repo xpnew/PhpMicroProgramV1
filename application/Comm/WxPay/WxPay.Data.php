@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\WxPay;
+namespace app\Comm\WxPay;
 
 /**
 * 2015-06-29 修复签名问题

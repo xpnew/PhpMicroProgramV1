@@ -1,6 +1,6 @@
 <?php
 
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 
 
 
@@ -49,13 +49,20 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
 
     protected  $GuilerModelArr = array();
 
+
+    protected  $IsEmpty = false;
     protected  $LayerNum = 0;
 
     protected  $LoopMax =  2;
     protected  $LoopStep = 0;
-    public function __construct($user, $orderModel,$orderClass){
+    public function __construct($user, $orderModel,$orderClass,$IsEmpty){
         parent::__construct();
 
+        $this ->IsEmpty = $IsEmpty;
+
+        if($IsEmpty){
+            return ;
+        }
 
 
 //        $this->OrderAmount = $orderAmount;
@@ -126,7 +133,7 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
 
     public  static  function CreateEmptyPool(){
 
-        return new EmptyPool(null,null,null,null  );
+        return new EmptyPool(null,null,null, true  );
     }
 
 

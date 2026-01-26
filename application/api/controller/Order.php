@@ -2,7 +2,7 @@
 
 namespace app\api\controller;
 
-use app\comm\Biz\BonusMng;
+use app\Comm\Biz\BonusMng;
 use think\Controller;
 use think\Request;
 use \app\Models\Client_OrderItemT;
@@ -13,6 +13,8 @@ use \app\Models\Client_UserT;
 use \app\Models\Client_BonusLogT;
 use \app\utils\GeneralTool;
 use \app\Models\Client_UserT as UserDB;
+
+use \app\Models\Product_InfoV as ProductInfoV;
 
 
 class Order extends ApiBase
@@ -40,7 +42,7 @@ class Order extends ApiBase
 
 
 
-    public function query(){ 
+    public function query(){
         $data =[  ];
         $ClassName = input('ClassName','');
         $UserId = input('UserId',-9999);
@@ -82,11 +84,13 @@ class Order extends ApiBase
         // 返回数据      
 
         $dbitems =  new Client_OrderItemT();
-        foreach($data as $k => $v){
-            $items = $dbitems -> where('OrderId',$v -> Id) -> select();
-            $data[$k] -> Items = $items;
+        foreach($data as $line){
+            $items = $dbitems -> where('OrderId',$line -> Id) -> select();
+            $this -> SayLog('订单子项集合：',$items,null);
+            $line -> Items = $items;
+            $this -> SayLog('订单数据：',$line,null);
         }
-
+        $this -> SayLog('生成的订单数据：',$data,null);
         return $this->SendJOk('查询成功',1,$data); 
 
 
@@ -118,7 +122,7 @@ class Order extends ApiBase
         ];
 
         
-        $prodb = new Product_InfoT();
+        $prodb = new ProductInfoV();
 
         //2026年1月19日  新增复购买1赠1
         /** @var int $IsRepurchase 复购的标志 */ $IsRepurchase  =  -1;
@@ -132,25 +136,36 @@ class Order extends ApiBase
         $TotalPoint = 0;
         $TotalPrice = 0;
         $TotalQty = 0;
-        $ClassId4SameJudge  = -1; // 同类别Id检查
+        $ProductZoneId4SameJudge  = -1; // 同类别Id检查
         $ProductClass  = null;
+        $ProductZoneId = -1;
+
         foreach($Items as $it){
             $product = $prodb -> where('Id',$it['ProductId']) -> find();
             if($product == null){
                 return $this->SendJErr('商品不存在' . $it['ProductId'] . ' '. $it['ProductName']);
             }
-            if(-1  != $ClassId4SameJudge   &&  $product -> ClassId != $ClassId4SameJudge){
-                return $this->SendJErr('只允许同类商品一起购买');
-            }
-            if( null == $ProductClass)
-            {
-                $ProductClass =  \app\Models\Product_ClassT::get($product -> ClassId);
-                if($ProductClass != null && 1 ==  $ProductClass -> EnablePointBuy){
-                    $IsPointBuyClass =  1;
+
+            if(-1  != $ProductZoneId  ){
+                if( $product -> ProductZoneId != $ProductZoneId){
+                    return $this->SendJErr('只允许相同分区的商品一起购买');
+                }
+            }else{
+                $ProductZoneId = $product -> ProductZoneId;
+                if(40006000 ==  $ProductZoneId){
+                    $this->IsPointBuy = 1;
                 }
             }
+//            if( null == $ProductClass)
+//            {
+//                $ProductClass =  \app\Models\Product_ClassT::get($product -> ClassId);
+//                if($ProductClass != null && 1 ==  $ProductClass -> EnablePointBuy){
+//                    $IsPointBuyClass =  1;
+//                }
+//
+//            }
 
-            $ClassId4SameJudge = $product -> ClassId;
+            $ProductClass =  \app\Models\Product_ClassT::get($product -> ClassId);
 
             //提前处理 有一些字段可能为空的情况。
             SetModel4Names($product,['UnitPrice','SellPoints'],0);
@@ -206,11 +221,20 @@ class Order extends ApiBase
             // $TotalPrice += $NewItem['TotalPrice'];
             
         }
+        $ProductZoneName = '';
+        $ZoneTypeDef =  \app\Models\Sys_TypeDefinedT::get($ProductZoneId);
+        if(null == $ZoneTypeDef){
+            $ProductZoneName = $ZoneTypeDef -> TypeName;
+        }
         $NewOrder['TotalPrice'] = $TotalPrice;
         $NewOrder['TotalPoint'] = $TotalPoint;
         $NewOrder['PayPrice'] = $TotalPrice;
         $NewOrder['TotalQty'] = $TotalQty;
+        $NewOrder['ProductZoneId'] = $ProductZoneId;
+        $NewOrder['ProductZoneName'] = $ProductZoneName;
         $NewOrder['IsRepurchase'] = $IsRepurchase;
+
+
 
         $this -> SayLog('New Order:'.json_encode($NewOrder));
         $this -> SayLog('New Items:'.json_encode($ItemList));
@@ -237,6 +261,7 @@ class Order extends ApiBase
 
     protected  $IsPreferredZone;
     protected  $CurrentProductClass;
+    protected  $Input ; // 注意添加 & 按引用 传递
 
     public function TestPayOrder(){
         $OrderId = \think\facade\Request::param('OrderId',0);
@@ -269,12 +294,29 @@ class Order extends ApiBase
         $dbitems =  Client_OrderItemT:: where('OrderId', $OrderId) -> select();
 
         $order -> Items = $dbitems;
+
         if( !isset($this -> CurrentProductClass)){
             $this -> CurrentProductClass = $this -> GetProductClass();
         }
         if( !isset($this -> IsPreferredZone)){
             $this -> IsPreferredZone = $this -> GetIsPreferredZone();
         }
+
+
+
+        $InputModel = $this->request->post();
+        $this -> Input = &$InputModel; //按引用传递
+
+        $InputModel['OrderNo'] =   $order-> OrderNo ;
+        $InputModel['TotalPrice'] =   $order-> PayPrice ;
+        $InputModel['ClientRealName'] =  $ExistUser-> RealityName;
+        $InputModel['ClientNickName'] =   $ExistUser-> NickName;
+        $InputModel['ClientPhone'] =   $ExistUser-> Mobile ;
+        $InputModel['ClientUserId'] = $UserId;
+        $InputModel['Rmk'] = $this ->  _BuildOrderRmk();
+        $InputModel['CreateTime'] = date('Y-m-d H:i:s');
+//        $this -> SayLog('输入信息 ：', $InputModel);
+//        $this -> SayLog('输入信息 $this -> Input ：', $this -> Input);
 
 
         $ConsumptionPoints  = $this -> BuildConsumptionPoints();
@@ -294,7 +336,6 @@ class Order extends ApiBase
         // 模拟支付成功
         $order -> PayStatus = 20005000;
         $order -> OrderStatus = 10005000;
-        $order -> save();
 
         if(null != $ConsumptionPoints){
             $ConsumptionPoints -> save();
@@ -311,42 +352,40 @@ class Order extends ApiBase
         // }
 
 
+//        return $this->SendJErr('测试：拦截处理，提前返回',-1, $ExistUser);
 
-
-
+        $order -> save();
         $ExistUser -> save();
 
-        $InputModel = $this->request->post();
 
 
-
-
-
-
-        $InputModel['OrderNo'] =   $order-> OrderNo ;
-
-
-
-        $InputModel['ClientRealName'] =  $ExistUser-> RealityName;
-        $InputModel['ClientNickName'] =   $ExistUser-> NickName;
-        $InputModel['ClientPhone'] =   $ExistUser-> Mobile ;
-        $InputModel['ClientUserId'] = $UserId;
-
+//        InfoLog('积分购买状态：' . $this-> IsPointBuy);
         if(! $this -> IsPointBuy  && ! $this -> IsPreferredZone){
             //生成积分
-            $PointLog  =  array_values($InputModel);
+//            $PointLog  =  [...$InputModel]; //展开运算符 7.4才支持
+//            $PointLog = $InputModel;//直接使用 =  克隆，但是语义不明显
+            $PointLog = array_merge($InputModel,[]); //展开运算符的替代品
+//            $this -> SayLog('日志模型数据 ：', $PointLog);
+            //$this->FillData4Log($PointLog);
 
-
-            $PointLog['CreateTime'] = date('Y-m-d H:i:s');
 
             $PointLog['Points'] = $order -> PayPrice * $CacheMng -> GetDecimal('ProductPointRatio',100) * 0.01;
-
             $PointLog['AssetModeId'] =90007000;
             $PointLog['AssetTypeId'] =80007000;
             $PointLog['AssetStatusId'] =81002000;
+            $PointLog['AssetModeName'] ='销售积分';
+            $PointLog['AssetTypeName'] ='积分';
+            $PointLog['AssetStatusName'] ='等待&冻结';
+
+            $PointLog['IsFrozen'] =1;
             $PointLog['ChangePoints'] = $PointLog['Points'];
+            $PointLog['Rmk']  .= "  为用户{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})变动积分[{$PointLog['Points']}]";
+            $PointLog['Rmk'] =mb_substr ( $PointLog['Rmk'] ,0,255, 'utf-8');
+
+
             $DB4PointLog= new \app\Models\Client_PointLogT();
             $this -> SayLog('积分操作： ' , $PointLog);
+
             $DB4PointLog->save($PointLog);
         }
 
@@ -355,41 +394,54 @@ class Order extends ApiBase
 
         $BM  = BonusMng::getInstance();
 
+//        InfoLog('准备 生成奖金');
         $poor =  $BM -> BuildPool4Id($OrderId,$UserId);
         $this -> SayLog('奖金池处理： ' , $poor);
 
         //生成见单奖
 
 
-        $AreaMaster  = array_values($InputModel);
+
 
 
         
         $RegionId = $order -> ClientRegionId;
-        if( isset($RegionId)){
+        if( isset($RegionId) ||  !$this->IsPointBuy){
+            $RegionAgent = \app\Models\Biz_RegionAgentT::get($RegionId);
+            if(null != $RegionAgent &&  isset($RegionAgent) && ! empty($RegionAgent)  ){
 
-            //$RegionAgent =  Biz_RegionAgentT::get($RegionId);
+                $AreaMaster  = array_merge($InputModel,[]); //展开运算符的替代品
+
+                //            $AreaMaster['CreateTime'] = date('Y-m-d H:i:s');
+
+                $AreaMaster['AssetTypeId'] =80001000;
+                $AreaMaster['AssetTypeName'] ='现金';;
+                $AreaMaster['AssetStatusId'] =81002000;
+                $AreaMaster['AssetStatusName'] ='等待&冻结';
+                $AreaMaster['AssetModeId'] =90005000;
+                $AreaMaster['AssetModeName'] ='见单奖';
+                $AreaMaster['ClientRealName'] =  $RegionAgent-> RealityName;
+                $AreaMaster['ClientNickName'] =   $RegionAgent-> NickName;
+                $AreaMaster['ClientPhone'] =   $RegionAgent-> Mobile ;
+                $AreaMaster['ClientUserId'] = $RegionAgent -> ClientUserId;
+
+                $AreaMaster['Bonus'] = $order -> PayPrice * $CacheMng -> GetDecimal('AreaMasterCommissions',2) * 0.01;
+                $AreaMaster['ChangeBonus'] = $AreaMaster['Bonus'];
+
+                $AreaMaster['Rmk']  .= " 为用户{$RegionAgent -> ClientUserId}({$RegionAgent-> RealityName})生成《见单奖》[{$AreaMaster['Bonus']}] ，来源用户：{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})";
+                $AreaMaster['Rmk'] =mb_substr ( $AreaMaster['Rmk'] ,0,255, 'utf-8');
+
+
+                $DB4BonusLog= new \app\Models\Client_BonusLogT();
+                $this -> SayLog('见单奖： ' , $AreaMaster);
+                $DB4BonusLog->save($AreaMaster);
+
+            }
+
 
 
 
         }
-
-        // $AreaMaster['CreateTime'] = date('Y-m-d H:i:s');
-
-        // $AreaMaster['AssetTypeId'] =80001000;
-        // $AreaMaster['AssetTypeName'] ='现金';;
-        // $AreaMaster['AssetStatusId'] =81002000;
-        // $AreaMaster['AssetStatusName'] ='等待&冻结';
-        // $AreaMaster['AssetModeId'] =90005000;
-        // $AreaMaster['AssetModeName'] ='见单奖';
-      
-
-        // $AreaMaster['Bonus'] = $order -> PayPrice * $CacheMng -> GetDecimal('AreaMasterCommissions',2) * 0.01;
-        // $AreaMaster['ChangeBonus'] = $AreaMaster['Bonus'];
-
-        // $DB4BonusLog= new \app\Models\Client_BonusLogT();
-        // $this -> SayLog('见单奖： ' , $AreaMaster);
-        // $DB4BonusLog->save($AreaMaster);
 
 
 
@@ -405,7 +457,7 @@ class Order extends ApiBase
         // $buycar -> where('UserId',$UserId) -> delete();
 
         
-        return $this->SendJErr('支付成功');
+        return $this->SendJOk('支付成功');
 
     }
 
@@ -487,6 +539,10 @@ class Order extends ApiBase
         if(0 < $order -> TotalPoint){
             $this -> IsPointBuy = true;
         }
+        else{
+            $this -> IsPointBuy = false;
+            return null;
+        }
 
         if(null ==  $user -> PointsBalance  || 0 ==  $user -> PointsBalance){
             $this -> _SetFail('用户没有积分不能支付积分消费的订单');
@@ -501,16 +557,11 @@ class Order extends ApiBase
 
 
 
-        $ProductNames = array_column($order->Items, 'ProductName');
-        $ResultString = implode(',', $ProductNames);
-        $Rmk = mb_substr('订单商品：' . $ResultString, 0, 255, 'UTF-8');
+
 
         $NewPoint =  new \app\Models\Client_PointLogT();
 
-        $NewPoint -> ClientUserId = $order -> UserId;
-        $NewPoint -> ClientRealName = $user -> RealityName;
-        $NewPoint -> ClientNickName = $user -> NickName;
-        $NewPoint -> ClientPhone = $user -> Mobile;
+        $this->FillData4Log($NewPoint);
 
         $NewPoint -> Qty = $order -> TotalQty;
         $NewPoint -> Points = $order -> TotalPoint;
@@ -532,7 +583,8 @@ class Order extends ApiBase
         $NewPoint -> CreateTime = date('Y-m-d H:i:s');
         $NewPoint -> IsFrozen = true;
         $NewPoint -> IsSuccess = 1;
-        $NewPoint -> Rmk = $Rmk ;
+        $NewPoint -> Rmk .= " 为用户{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})变动积分[{$NewPoint -> ChangePoints}]";
+        $NewPoint -> Rmk =mb_substr ( $NewPoint -> Rmk,0,255, 'utf-8');
 
         $user -> PointsBalance =  $NewPoint -> NewPoints;
         $user -> PointsHistory += $NewPoint -> Points;
@@ -544,9 +596,35 @@ class Order extends ApiBase
 
     }
 
+
+
+    function  _BuildOrderRmk()
+    {
+        $ProductNames = array_column($this -> CurrentOrder ->Items -> toArray(), 'ProductName');
+        $ResultString = implode(',', $ProductNames);
+        $Rmk = mb_substr('订单商品：' . $ResultString, 0, 255, 'UTF-8');
+        return $Rmk;
+    }
+
+    protected  function FillData4Log($log)
+    {
+//        InfoLog('尝试诊断 日志 的问题 ：' .json_encode ($log)) ;
+        //$log  =  array_merge($log,$this -> Input );
+        FillArr2Model( $this -> Input,$log);
+
+//        $order =  $this -> CurrentOrder;
+//        $user = $this -> CurrentUser;
+//        $log -> ClientUserId = $order -> UserId;
+//        $log -> ClientRealName = $user -> RealityName;
+//        $log -> ClientNickName = $user -> NickName;
+//        $log -> ClientPhone = $user -> Mobile;
+//        $log -> OrderId = $order -> Id;
+//        $log -> OrderNo = $order -> OrderNo;
+    }
+
     protected function GetIsPreferredZone($orderitem = null){
         $Class =  null;
-        if(null == $orderitem -> IsPreferredZone){
+        if(null == $orderitem){
 
             $Class = $this -> CurrentProductClass;
         }else{
@@ -564,7 +642,7 @@ class Order extends ApiBase
 
     }
 
-    public function GetProductClass($orderitem){
+    public function GetProductClass($orderitem  = null){
 
         if(null  ==  $orderitem){
             if(null ==  $this -> CurrentOrder  || null ==  $this -> CurrentOrder -> Items || 0 ==  count( $this -> CurrentOrder -> Items)){
@@ -596,7 +674,7 @@ class Order extends ApiBase
 
     // 统计订单
     public function StatisticsOrder($order,$user){ 
-        $mng =  \app\comm\SysSetCacheMng::getIns();
+        $mng =  \app\Comm\SysSetCacheMng::getIns();
         $this -> Lv1Bonus =  (float)$mng -> GetSet('Maker2Commissions');
         $this -> Lv2Bonus =  (float)$mng -> GetSet('Maker3Commissions');
         $this -> Lv2GoldBounus =  (float)$mng -> GetSet('Maker3GoldCommissions');

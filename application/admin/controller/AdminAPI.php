@@ -7,7 +7,7 @@ use think\Request;
 
 use think\facade\Log;
 
-use app\comm\CommControllerBase;
+use app\Comm\CommControllerBase;
 
 
 class AdminAPI extends CommControllerBase

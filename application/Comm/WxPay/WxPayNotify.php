@@ -1,8 +1,8 @@
 <?php
-namespace app\comm\WxPay;
+namespace app\Comm\WxPay;
 
-use app\comm\WxPay\WxPayConfig;
-use app\comm\WxPay\WxPayApi;
+use app\Comm\WxPay\WxPayConfig;
+use app\Comm\WxPay\WxPayApi;
 
 require_once "WxPay.Api.php";
 require_once "WxPay.Config.php";

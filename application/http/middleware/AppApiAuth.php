@@ -1,7 +1,7 @@
 <?php
 namespace app\http\middleware;
-use app\comm\Token\TokenMng;
-use app\comm\Token\TokenItem;
+use app\Comm\Token\TokenMng;
+use app\Comm\Token\TokenItem;
 
 class AppApiAuth
 {

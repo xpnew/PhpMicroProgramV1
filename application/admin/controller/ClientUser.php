@@ -22,8 +22,8 @@ class ClientUser extends AdminBase
     public function index()
     {
         $this -> _InitViewData();
-        $MakeingLvList  =  \app\Models\Biz_MarketingLevelT::select();
-        $this->assign('MakeingLvList', $MakeingLvList);
+        $MakingLvList  =  \app\Models\Biz_MarketingLevelT::select();
+        $this->assign('MakingLvList', $MakingLvList);
 
 
         return $this->fetch();
@@ -47,7 +47,7 @@ class ClientUser extends AdminBase
         $NickName = input('NickName','');
         $RealityName = input('RealityName',''); 
         
-        $MakerLevel = input('MakerLevel','');
+        $MakerLevelId = input('MakerLevelId','');
 
 
         $PageIndex = input('PageIndex',1);
@@ -71,9 +71,9 @@ class ClientUser extends AdminBase
             $EndTime = $EndTime -> format('Y-m-d H:i:s');
             $where[] = ['RegisterDate','<',$EndTime ];
         }
-        // if($ClassId != ''){
-        //     $where[] = ['ClassId','=',$ClassId];
-        // }        
+         if($MakerLevelId != ''){
+             $where[] = ['MakerLevelId','=',$MakerLevelId];
+         }
 
         if($NickName != ''){
             $where[] = ['NickName','like','%'.$NickName.'%'];
@@ -191,6 +191,8 @@ class ClientUser extends AdminBase
         }
 
         $Id = input('id',0);
+        $IsLevelUp = input('IsLevelUp',0);
+
         $db= new \app\Models\Client_UserT();
 
 
@@ -201,6 +203,7 @@ class ClientUser extends AdminBase
         $this-> SayLog('尝试输出： ' , $Model);
 
         $this->assign('Model', $Model);
+        $this->assign('IsLevelUp', $IsLevelUp);
         $this->assign('ProductClassList', \app\Models\Product_ClassT::select());
         $MakeingLvList  =  \app\Models\Biz_MarketingLevelT::select();
         $this->assign('MakeingLvList', $MakeingLvList);

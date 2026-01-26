@@ -11,7 +11,7 @@ use \app\Models\Product_InfoT;
 use \app\Models\Client_UserT;
 use \app\Models\Clinet_BonusLogT;
 use \app\utils\GeneralTool;
-use app\comm\WxPay\WxPayNotify;
+use app\Comm\WxPay\WxPayNotify;
 use think\facade\Log;
 use think\facade\Route;
 

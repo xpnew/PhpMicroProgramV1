@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.3",
         "topthink/framework": "5.1.*",
         "ramsey/uuid": "^4.2",
         "alibabacloud/dysmsapi": "^1.8",

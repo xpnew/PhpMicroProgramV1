@@ -53,11 +53,18 @@ class Client_OrderT extends Model
     protected $table = 'Client_OrderT';
     protected $pk = 'Id';
     /** @var array $$Items 订单明细子项*/
-    public  $Items =[];
+    public  $Items; ///显示声明类的属性以后必须配合 $append 和 getter 才能获得json序列化有值
+
+    protected  $append = ['items'];
+
     // 模型初始化
     protected static function init()
     {
         //TODO:初始化内容
+    }
+
+    public function getItemsAttr($value,$data){
+        return $this->Items;
     }
 
 }

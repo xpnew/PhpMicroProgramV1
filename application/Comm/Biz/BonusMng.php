@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 
 
 class BonusMng{
@@ -26,32 +26,33 @@ class BonusMng{
     }
 
 
-    public  function  BuildPool4Model( $order,$user,$productClass){
+    public  function  BuildPool4Model( $user,$order,$productClass){
         $ResultPool   =  BonusPoolBase::CreateEmptyPool();
 
+        $ProductZoneId  =  $order -> ProductZoneId;
 
 
 //        var_dump($ProductClass)  ;
-        if(1 == $productClass -> EnablePointBuy){
+        if(40003000 ==  $ProductZoneId ){
             $ResultPool-> SetErr('积分不计算奖金');
             // 积分不计算奖金
             return $ResultPool;
         }
 
-        if(0 == $productClass -> EnableBuildBonus){
-            $ResultPool-> SetErr('分类设置为允许生成奖励才能进行结算');
-            // 分类设置为允许生成奖励才能进行结算
-            return $ResultPool;
-        }
+//        if(0 == $productClass -> EnableBuildBonus){
+//            $ResultPool-> SetErr('分类设置为允许生成奖励才能进行结算');
+//            // 分类设置为允许生成奖励才能进行结算
+//            return $ResultPool;
+//        }
 
-        if(1 ==  $productClass -> IsMarkerLvlBonus ){
+        if(40001000 ==  $ProductZoneId){
             $ResultPool = new BonusPool4MarkerLvl($user,$order,$productClass);
 //            echo  'erorr branch 1  $ProductClass -> IsMarkerLvlBonus '  ;
 //            // 检查框架是否重写了属性
 //            var_dump($ProductClass->getAttributes()); // Laravel Eloquent方法
 //            var_dump($ProductClass->toArray()); // 检查实际存储的属性
 
-        }else{
+        }else if (40002000 ==  $ProductZoneId){
             $ResultPool = new BonusPool4Guider($user,$order,$productClass);
 
 //            echo  'erorr branch 2  $ProductClass -> IsMarkerLvlBonus '  ;
@@ -70,7 +71,7 @@ class BonusMng{
     {
         $ResultPool   =  BonusPoolBase::CreateEmptyPool();
         $Order  =  \app\Models\Client_OrderT::get($orderId);
-
+//        InfoLog('尝试论断订单的问题 ：' .json_encode ($Order)) ;
         $FirstItem  =  \app\Models\Client_OrderItemT::where('OrderId',$orderId)->findOrFail();
 
         if(! $FirstItem){
@@ -84,7 +85,7 @@ class BonusMng{
         }
 
         $User =  \app\Models\Client_UserT::get($userId);
-        return  $this -> BuildPool4Model($Order,$User,$ProductClass);
+        return  $this -> BuildPool4Model($User,$Order,$ProductClass);
 
 //        var_dump($FirstItem)  ;
         //PHPStorm 自动添加 了 ProductClassId  属性，造成赋值 失败

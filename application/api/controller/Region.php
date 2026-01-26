@@ -1,7 +1,7 @@
 <?php
 
 namespace app\api\controller;
-use app\comm\CommControllerBase;
+use app\Comm\CommControllerBase;
 
 use think\Controller;
 use think\Request;

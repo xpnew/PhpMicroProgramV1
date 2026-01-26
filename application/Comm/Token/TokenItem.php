@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\Token;
+namespace app\Comm\Token;
 
 
 class TokenItem

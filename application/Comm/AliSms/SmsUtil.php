@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\AliSms;
+namespace app\Comm\AliSms;
 
 
 use AlibabaCloud\SDK\Dysmsapi\V20170525\Dysmsapi;

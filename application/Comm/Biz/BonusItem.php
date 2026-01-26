@@ -1,6 +1,6 @@
 <?php
 
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 ///用来保存奖金处理过程当中的数据
 class BonusItem{
 

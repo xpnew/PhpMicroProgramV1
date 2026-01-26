@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\Token;
+namespace app\Comm\Token;
 use think\Exception;
 use app\utils\GeneralTool;
 

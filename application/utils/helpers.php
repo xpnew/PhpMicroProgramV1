@@ -126,20 +126,80 @@ if (!function_exists('SetModel4Names')) {
      */
     function SetModel4Names(object &$obj,array $nameArr,$default)
     {
-        foreach ($nameArr as $k => $propertyName) {
-
-            // 检查对象是否存在该属性（包括 public, private, protected）
-            // property_exists 检查的是“定义”，isset 检查的是“是否有值(null不算)”
-            if (property_exists($obj, $propertyName)) {
-                // 属性已定义，但要看它有没有值
-                if (!isset($obj->$propertyName)) {
+        if($obj instanceof \think\Model){  // 对Model来说字段不是直接属性 property_exists($obj, $propertyName)永远是false
+            $ModelData = $obj->getData();
+            foreach ($nameArr as $k => $propertyName) {
+                if (array_key_exists($propertyName, $ModelData)) {
+                    $value = $ModelData[$propertyName];
+                    if(null === $value){
+                        $ModelData[$propertyName] = $default;
+                    }
+                }
+                else{
+                    if ($obj->get($propertyName) === null) {
+                        $obj->setAttr($propertyName, $default);
+                    }
+                }
+            }
+        }else{
+            foreach ($nameArr as $k => $propertyName) {
+                // 检查对象是否存在该属性（包括 public, private, protected）
+                // property_exists 检查的是“定义”，isset 检查的是“是否有值(null不算)”
+                if (property_exists($obj, $propertyName)) {
+                    // 属性已定义，但要看它有没有值
+                    if (!isset($obj->$propertyName)) {
+                        $obj->$propertyName = $default;
+                    }
+                } else {
+                    // 属性从未定义过，直接创建并赋值（PHP 允许动态添加属性）
                     $obj->$propertyName = $default;
                 }
-            } else {
-                // 属性从未定义过，直接创建并赋值（PHP 允许动态添加属性）
-                $obj->$propertyName = $default;
             }
         }
+    }
+}
+
+if (!function_exists('FillArr2Model')) {
+    function FillArr2Model($arr,object &$obj){
+        if($obj instanceof \think\Model){
+            $ModelData = $obj->getData();
+            foreach ($arr as $k => $v) {
+                if (array_key_exists($k, $ModelData)) {
+                    $value = $ModelData[$k];
+                    if(null === $value){
+                        $obj[$k] = $v;
+                    }
+                }
+                else{
+                    $obj[$k] = $v;
+                }
+            }
+        }else{
+            $arr2 =  $obj -> toArray();
+            foreach ($arr as $k => $v) {
+                // 检查对象是否存在该属性（包括 public, private, protected）
+                // property_exists 检查的是“定义”，isset 检查的是“是否有值(null不算)”
+                if (property_exists($obj, $k)) {
+                    // 属性已定义，但要看它有没有值
+                    if (!isset($obj->$k)) {
+                        $obj->$k = $v;
+                    }
+                } else {
+                    // 属性从未定义过，直接创建并赋值（PHP 允许动态添加属性）
+                    $obj->$k = $v;
+                }
+            }
+        }
+    }
+}
+if (!function_exists('InfoLog')) {
+    function InfoLog($info,$model=[]){
+        \think\Facade\Log::info($info,$model);
+    }
+}
+if (!function_exists('DebugLog')) {
+    function DebugLog($tit,$model=[]){
+        \think\Facade\Log::info($tit,$model);
     }
 }
 

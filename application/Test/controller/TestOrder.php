@@ -2,7 +2,7 @@
 namespace app\test\controller;
 use think\Controller;
 use \app\Models\Client_OrderItemT;
-use app\comm\CommControllerBase;
+use app\Comm\CommControllerBase;
 
 
 
@@ -16,7 +16,59 @@ class TestOrder extends CommControllerBase
         return 'test order';
     }
 
+    public function query(){
+        $data =[  ];
+        $ClassName = input('ClassName','');
+        $UserId = input('UserId',-9999);
+        $OrderStatus = input('OrderStatus','');
+        $Status = input('Status','');
+        $ProductName = input('ProductName','');
 
+        $PageIndex = input('PageIndex',1);
+        $PageSize = input('PageSize',10); // 每页显示数量
+
+
+        if($UserId == -9999){
+            return $this->SendJErr('请先登录',-9999);
+        }
+
+        $where = [];
+        $where[] = ['UserId','=',$UserId];
+        if($ClassName != ''){
+            $where[] = ['ClassName','like','%'.$ClassName.'%'];
+        }else{
+            $where[] = ['Id','>',0];
+
+        }
+        if($OrderStatus != ''){
+            $where[] = ['OrderStatus','=',$OrderStatus];
+        }
+        if($Status != ''){
+            $where[] = ['OrderStatus','=',$Status];
+        }
+        if($ProductName != ''){
+            $where[] = ['ProductName','like','%'.$ProductName.'%'];
+        }
+        $db= new \app\Models\Client_OrderT();
+
+        $data = $db -> where($where)
+            -> order(['UpdateTime' => 'desc','Id'=>'desc'])
+            -> limit( ( $PageIndex-1) * $PageSize, $PageSize)  ->select();
+        // $data = $data->toArray();
+        // 返回数据
+
+        $dbitems =  new Client_OrderItemT();
+        foreach($data as $line){
+            $items = $dbitems -> where('OrderId',$line -> Id) -> select();
+            $this -> SayLog('订单子项集合：',$items,null);
+            $items =  $items -> toArray();
+            $line -> Items = $items;
+            $this -> SayLog('订单数据：',$line,null);
+        }
+        $this -> SayLog('生成的订单数据：',$data,null);
+        return $this->SendJOk('查询成功',1,$data);
+
+    }
 
     public function TestNewItem(){
         $db = new \app\Models\Client_OrderItemT();

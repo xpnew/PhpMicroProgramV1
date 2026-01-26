@@ -1,12 +1,12 @@
 <?php
 namespace app\api\controller;
 use think\Controller;
-use app\comm\CommControllerBase;
-use app\comm\AliSms\SmsCodeMng;
-use app\comm\AliSms\SmsUtil;
+use app\Comm\CommControllerBase;
+use app\Comm\AliSms\SmsCodeMng;
+use app\Comm\AliSms\SmsUtil;
 
-use app\comm\Token\TokenMng;
-use app\comm\Token\TokenItem;
+use app\Comm\Token\TokenMng;
+use app\Comm\Token\TokenItem;
 use think\facade\Config  AS SysCfg;
 
 use app\Models\Client_UserT;
@@ -59,13 +59,13 @@ class Stranger extends CommControllerBase
             'templateCode' =>  SysCfg::get('sms.aliyun_sms_templatcode'),
         ];
 
-        if($EnableDebug){
-
-            $this -> Msg -> IsDebug =  true;
-
-            return $this-> SendJOk('短信发送成功' . $phone,20160119 ,[]);
-
-        }
+//        if($EnableDebug){
+//
+//            $this -> Msg -> IsDebug =  true;
+//
+//            return $this-> SendJOk('短信发送成功' . $phone,20160119 ,[]);
+//
+//        }
         $Return =  SmsUtil::Send($phone,$NewCode,$AliConfig);
         $this -> SayLog('TestSms2 PhoneCheck Return:'.json_encode($Return));
         if('OK' == $Return -> code){
@@ -136,7 +136,7 @@ class Stranger extends CommControllerBase
         }
 
         ///新用户默认密码
-        $mng =  \app\comm\SysSetCacheMng::getIns();
+        $mng =  \app\Comm\SysSetCacheMng::getIns();
         $DefaultPwd =  $mng -> GetSet('NewUserPassword');
         $RootGuiderUserId = $mng -> GetInt('RootGuiderUserId',0);
         if( !isset($DefaultPwd) || $DefaultPwd == ''){

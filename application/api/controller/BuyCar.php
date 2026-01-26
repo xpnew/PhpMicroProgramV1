@@ -30,17 +30,19 @@ class BuyCar extends ApiBase
         if($ClassName != ''){
             $where[] = ['ClassName','like','%'.$ClassName.'%'];
         }else{
-            $where[] = ['Id','>',0];
+//            $where[] = ['Id','>',0];
 
         }
         if($UserId != ''){
             $where[] = ['UserId','=',$UserId];
         }        
  
-        $Product_InfoT= new \app\Models\Client_BuyCarItemT();
-
-        $data = $Product_InfoT -> where($where) 
-        -> order(['Id'=>'desc'])
+        $DB= new \app\Models\Client_BuyCarItemT();
+        $data = $DB
+            -> join('Product_ClassT', 'Client_BuyCarItemT.ProductClassId = Product_ClassT.Id', 'INNER')
+            -> where($where)
+            -> field('Client_BuyCarItemT.*, Product_ClassT.ProductZoneId as ProductZoneId') // 明确指定字段
+        -> order(['Client_BuyCarItemT.Id'=>'desc'])
         -> limit( ( $PageIndex-1) * $PageSize, $PageSize)  ->select();
         $data = $data->toArray();    
         // 返回数据      
@@ -124,13 +126,58 @@ class BuyCar extends ApiBase
         return $this->SendJOk('查询成功',1,$data);         
     }   
     /**
-     * 显示创建资源表单页.
+     * 创建到购物车，与添加不一样：已经存在则不增加数量
      *
      * @return \think\Response
      */
-    public function create()
+    public function create($id,$userid)
     {
-        //
+        $where = [];
+        $where[] = ['ProductId','=',$id];
+        $where[] = ['UserId','=',$userid];
+        $db= new \app\Models\Client_BuyCarItemT();
+        $Exist = $db -> where($where) ->find();
+        if($Exist != null){
+            // $Exist -> Qty = $Exist -> Qty + 1;
+            // $Exist -> save();
+            return $this->SendJOk('添加成功（已经存在）',1,$Exist);
+        }
+        $pro = \app\Models\Product_InfoT::get($id);
+        if($pro == null){
+            return $this->SendJErr('商品不存在');
+        }
+        $ProductClass =  \app\Models\Product_ClassT::get($pro -> ClassId);
+        if($ProductClass == null){
+            return $this->SendJErr('商品分类不存在');
+        }   
+        // $this -> SayLog('$ProductClass', $ProductClass);
+
+        $Price = null;
+        if($pro -> DiscountPrice !=  null ){
+            $Price = $pro -> DiscountPrice;
+        }else{
+            $Price = $pro -> NormalPrice;
+        }   
+        if($Price == null){
+            return $this->SendJErr('商品没有价格');
+        }
+        $data = [
+            'ProductId' => $id,
+            'UserId' => $userid,
+            'Qty' => 1,
+            'CreateTime' => date('Y-m-d H:i:s'),
+            'UnitPrice' => $Price   ,
+            'TotalPrice' => $Price,
+            'ProductName' => $pro -> ProductName,
+            'ProductPic' => $pro -> ProductPic, 
+            'ProductCode' => $pro -> ProductCode,
+            'ProductClassName' => $ProductClass -> ClassName,
+            'ProductClassId' => $ProductClass -> Id,
+            'Summary' => $pro -> Summary,
+        ];
+        $db -> save($data);
+        return $this->SendJOk('添加成功',1,$db);
+
     }
 
     /**

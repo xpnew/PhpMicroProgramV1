@@ -1,8 +1,8 @@
 <?php
 
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 
-use app\comm\Biz\BonusPoolBase;
+use app\Comm\Biz\BonusPoolBase;
 
 class BonusPool4Guider extends BonusPoolBase
 {
@@ -19,7 +19,7 @@ class BonusPool4Guider extends BonusPoolBase
 
 
 
-        parent::__construct($user, $orderModel,$orderClass);
+        parent::__construct($user, $orderModel,$orderClass,false);
 
     }
     protected function _Init(){  //初始化

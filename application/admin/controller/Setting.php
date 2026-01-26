@@ -146,7 +146,7 @@ class Setting extends AdminBase
         }else{
             return $this->SendJErr('参数错误，无法保存');
         }
-        $mng =  \app\comm\SysSetCacheMng::getIns();
+        $mng =  \app\Comm\SysSetCacheMng::getIns();
         $mng -> Set($SetName,$SetVal);
         return $this->SendJOk('保存成功');
 

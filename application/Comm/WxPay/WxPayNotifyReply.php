@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\WxPay;
+namespace app\Comm\WxPay;
 
 require_once "WxPay.Data.php";
 require_once "WxPay.Api.php";

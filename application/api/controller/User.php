@@ -3,8 +3,8 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Request;
-use app\comm\Token\TokenMng;
-use app\comm\Token\TokenItem;
+use app\Comm\Token\TokenItem;
+use app\Comm\Token\TokenMng;
 use app\Models\Client_UserT;
 use app\Models\Client_User_View  as ViewDB;
 
@@ -74,7 +74,7 @@ class User extends ApiBase
             return $this->SendJErr('参数错误');
         }
 
-        $mng =  \app\comm\SysSetCacheMng::getIns();
+        $mng =  \app\Comm\SysSetCacheMng::getIns();
         // if ($mng) {
         //     return json(['Type' => 0, 'Content' => $mng -> GetSet('LockLogin')]);
         // }
@@ -166,7 +166,8 @@ ON T0.TypeId =T1.`OrderStatus`  order by `GroupOrd`";
 
         //$Data =  Db::query("select * from think_user where id=? AND status=?", [8, 1]);
         $Data =  Db::query($sql, [$UserId]);
-        $this -> SayLog('StatisticsOrder 统计订单结果 :', $Data);
+        $this -> SayLog('StatisticsOrder 统计
+        订单结果 :', $Data);
 
         return $this->SendJOk('查询成功',1,$Data);
         

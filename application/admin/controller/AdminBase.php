@@ -5,9 +5,9 @@ namespace app\admin\controller;
 use think\Controller;
 use think\facade\Log;
 use think\facade\Route;
-use app\comm\CommMsg;
-use app\comm\QueryMsg;
-use app\comm\CommControllerBase;
+use app\Comm\CommMsg;
+use app\Comm\QueryMsg;
+use app\Comm\CommControllerBase;
 
 class AdminBase extends CommControllerBase
 {

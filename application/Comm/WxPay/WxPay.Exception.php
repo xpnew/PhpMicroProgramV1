@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\WxPay;
+namespace app\Comm\WxPay;
 /**
  * 
  * 微信支付API异常类

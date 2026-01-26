@@ -5,9 +5,9 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Request;
-use app\comm\Token\TokenMng;
-use app\comm\Token\TokenItem;
-use app\comm\CommControllerBase;
+use app\Comm\Token\TokenMng;
+use app\Comm\Token\TokenItem;
+use app\Comm\CommControllerBase;
 
 
 class TestToken extends CommControllerBase

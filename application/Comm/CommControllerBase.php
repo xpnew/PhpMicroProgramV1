@@ -5,8 +5,8 @@ namespace app\Comm;
 use think\Controller;
 use think\facade\Log;
 use think\facade\Route;
-use app\comm\CommMsg;
-use app\comm\QueryMsg;
+use app\Comm\CommMsg;
+use app\Comm\QueryMsg;
 
 class CommControllerBase extends Controller
 {
@@ -74,7 +74,7 @@ class CommControllerBase extends Controller
         Log::record('程序出错' . $title . ' ex=' . json_encode($ex) . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
         // Log::error('程序出错' . $title . ' ex=' . json_encode($ex)   . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current));
 
-        LogError($title ,$data, $ex );
+        $this -> LogError($title ,$data, $ex );
         
         return json($this->QMsg);
     }
@@ -110,11 +110,8 @@ class CommControllerBase extends Controller
         $this->Msg->SetErr($title, $code,   $data,$ex);
 
         $pathinfo = $this->request->pathinfo(); // 获取当前请求的pathinfo
-        // $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
-        $current =  Route:: getCurrentRule();
 
-
-        Log::record('程序出错' . $title . ' ex=' . json_encode($ex) . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
+        Log::record('程序出错' . $title . ' ex=' . json_encode($ex) . ' pathinfo=' . $pathinfo  );
         // Log::error('程序出错' . $title . ' ex=' . json_encode($ex)   . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current));
 
         $this-> LogError($title ,$data, $ex );
@@ -124,24 +121,56 @@ class CommControllerBase extends Controller
 
     protected function SayLog($title ,$model =  null){
         $pathinfo = $this->request->pathinfo(); // 获取当前请求的pathinfo
-        // $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
-        $current =  Route:: getCurrentRule();       
-        Log::record('日志输出：' . $title . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
+
+        $CurrentRoute = $this->GetRoute();
+        Log::record('日志输出：' . $title . ' pathinfo=' . $pathinfo .  ' 路由规则=' . $this->GetRoute2Str() );
         if(null != $model){
             Log::record('模型数据：\n'  . json_encode($model)   );
         }
     }
     protected function LogError($title ,$model =  null, $ex=null){
         $pathinfo = $this->request->pathinfo(); // 获取当前请求的pathinfo
-        // $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
-        $current =  Route:: getCurrentRule();    
-        Log::record('程序出错：' . $title . ' pathinfo=' . $pathinfo . ' current=' . json_encode($current)  );
+
+
+//        $currentAction =  $dispatch->controller() . '/' .  $dispatch->action(); // 当前操作
+        //
+
+        Log::record('程序出错：' . $title . ' pathinfo=' . $pathinfo .  ' 路由规则=' . $this->GetRoute2Str() );
         if(null != $model ){
              Log::record('模型数据：\n'  . json_encode($model)   );
         }
         if(null != $ex){
             Log::record('异常信息：\n'  . json_encode($ex)   );
         }
+    }
+
+    //获取路由信息 并且转为字符串
+    protected function GetRoute2Str(){
+        $r = $this->GetRoute();
+        if(null == $r){
+            return null;
+        }
+        $arr =  $r -> toArray();
+        return json_encode($arr);
+    }
+
+
+    protected  function GetRoute(){
+//        if(Route::getRule() ) // 根据千问的反馈，getRule 只能获取指定名称的路由，这里不适用
+//            $current = Route::getRule()->getRule('current'); // 获取当前路由规则（如果有的话）
+//        if(null != $current && isset($current) && ! empty($current)){
+//            return $current;
+//        }
+        $current =  Route:: getCurrentRule();
+        if(null != $current && isset($current) && ! empty($current)){
+            return $current;
+        }
+        // 获取调度信息
+        $dispatch =  $this->request->dispatch();
+        if(null != $dispatch &&  isset($dispatch) && null != $dispatch-> rule() ) {
+//            $current = $dispatch->rule()->getRule() ?? 'N/A'; // 命中的路由规则
+        }
+        return null;
     }
 
     ///移除不要的字段，通常是为了保存的时候，不想修改什么数据

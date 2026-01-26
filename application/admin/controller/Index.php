@@ -37,7 +37,7 @@ class Index extends AdminBase
 
         $mng =  null; 
         try { 
-            $mng =  \app\comm\SysSetCacheMng::getIns();
+            $mng =  \app\Comm\SysSetCacheMng::getIns();
 
         }
          catch (\Exception $e) {

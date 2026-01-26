@@ -1,7 +1,7 @@
 <?php
 namespace app\test\controller;
 use think\Controller;
-use app\comm\CommControllerBase;
+use app\Comm\CommControllerBase;
 
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Client\Exception\ClientException;

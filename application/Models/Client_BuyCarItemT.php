@@ -19,6 +19,11 @@ class Client_BuyCarItemT extends Model
         //TODO:初始化内容
     }
 
+//    public function ProductClass()
+//    {
+//        return $this->belongsTo('Product_ClassT','ProductClassId','Id');
+//    }
+
 }
 
 

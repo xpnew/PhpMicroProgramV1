@@ -1,5 +1,5 @@
 <?php
-namespace app\comm\Biz;
+namespace app\Comm\Biz;
 
 
 

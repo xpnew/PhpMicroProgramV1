@@ -57,7 +57,7 @@ class TestRedis
     public function test2()
     {
     
-       $mng =  \app\comm\SysSetCacheMng::getIns();
+       $mng =  \app\Comm\SysSetCacheMng::getIns();
        $mng -> Set('Test222',2);
 
       
@@ -67,7 +67,7 @@ class TestRedis
     public function Reload()
     {
     
-       $mng =  \app\comm\SysSetCacheMng::getIns();
+       $mng =  \app\Comm\SysSetCacheMng::getIns();
        $mng -> Reload();
 
       
