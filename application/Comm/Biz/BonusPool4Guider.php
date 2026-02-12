@@ -33,23 +33,24 @@ class BonusPool4Guider extends BonusPoolBase
     protected function _BuildBonus(){
         $Items =  $this -> OrderModel -> Items;
         if(null ==  $Items  || 0 ==  count($Items)){
-            $Items = \app\Models\Client_OrderItemT::where('', $this-> OrderId) -> select();
+            $Items = \app\Models\Client_OrderItemT::where('OrderId', $this-> OrderId) -> select();
             if(empty($Items)) {
                 $this->SayErrLog('程序出错了，计算奖金数额，无法获取订单明细。');
                 return;
             }
         }
-        $pro_ids = array_column($Items, 'ProductId');
+        $pro_ids = FilterModelAttr($Items, 'ProductId');
 
-        $Pros =  \app\Models\Product_InfoT::where('ProductId', 'in', $pro_ids) -> select();
+        $Pros =  \app\Models\Product_InfoT::where('Id', 'in', $pro_ids) -> select();
 
         $DirectGuider = 0;
         $IndirectGuider =0;
 //        $DirectGuiderRatio IndirectGuiderRatio
         foreach($Items as $k => $entry){
             $ProductId = $entry -> ProductId;
-            $FoundProduct = current(array_filter($Pros, function($pro) use ($ProductId) { return $pro['Id'] == $ProductId; }));
-
+//            $FoundProduct = current(array_filter($Pros, function($pro) use ($ProductId) { return $pro['Id'] == $ProductId; }));
+            // 直接在集合上调用 first 方法
+            $FoundProduct = $this -> GetProByid($Pros,   $ProductId);
             if(null ==  $FoundProduct)  continue;
             if( !isset( $entry -> TotalPrice)){ continue;}
 
@@ -65,6 +66,16 @@ class BonusPool4Guider extends BonusPoolBase
 
 
     }
+
+    protected  function  GetProByid($data,$ProductId){
+        foreach ($data as  $pro) {
+            if( $pro['Id'] == $ProductId){
+                return $pro;
+            }
+        }
+        return null;
+    }
+
 
     protected  function Pushuser($user,$layerNum){
 
@@ -147,8 +158,10 @@ class BonusPool4Guider extends BonusPoolBase
             $BonusLog -> AssetTypeName = '现金';
             $BonusLog -> AssetStatusId = 81002000;//资产状态
             $BonusLog -> AssetStatusName = '等待&冻结';
-
-
+            $BonusLog -> CreateTime =  date('Y-m-d H:i:s');
+            $BonusLog -> Rmk = $this ->Rmk;
+            $BonusLog -> Rmk .= " ，来源用户：{$this->OriginUserModel->Id}({$this->OriginUserModel->RealityName})";
+            $BonusLog -> Rmk =mb_substr ( $BonusLog -> Rmk,0,500, 'utf-8');
             if( 0 == $i){
                 $BonusLog -> AssetModeId = 90003000; //资产模式
                 $BonusLog -> AssetModeName = '直推奖';

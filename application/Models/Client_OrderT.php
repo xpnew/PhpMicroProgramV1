@@ -25,7 +25,7 @@ use think\Model;
  * @property string $CreateTime 创建时间
  * @property string $UpdateTime 更新时间
  * @property string $Remark 备注
- * @property string $Comment 附注、说明
+ * @property string $Comment 补充说明（前端看不到）
  * @property string $AuditUser 审核人
  * @property string $AuditTime 审核时间
  * @property integer $AuditStatusId 审核状态
@@ -47,6 +47,8 @@ use think\Model;
  * @property integer $EnableBuildPoint 允许生成积分/银果
  * @property integer $EnablePointBuy 允许积分/银果购买
  * @property integer $IsRepurchase 是否为复购(VIP以上会员)
+ * @property integer $ProductZoneId 商品分区 ：ProductZoneDef枚举
+ * @property string $ProductZoneName 商品分区 （名称）
  */
 class Client_OrderT extends Model
 {
@@ -55,7 +57,7 @@ class Client_OrderT extends Model
     /** @var array $$Items 订单明细子项*/
     public  $Items; ///显示声明类的属性以后必须配合 $append 和 getter 才能获得json序列化有值
 
-    protected  $append = ['items'];
+    protected  $append = ['Items'];
 
     // 模型初始化
     protected static function init()

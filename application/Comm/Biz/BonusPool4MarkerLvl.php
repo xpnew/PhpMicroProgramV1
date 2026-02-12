@@ -55,7 +55,7 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
         $NewBonusItem -> UserId = $user -> Id;
 
 
-        $this -> LayerNum ++;
+//        $this -> LayerNum ++;
 
 
         if (array_key_exists($user -> MakerLevelId, $this-> GroupDict)) {
@@ -106,7 +106,7 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
             $Group -> RealtimeLevelDifference = $a * 0.01;
             if( 0 < $a){
                 $TotalLevelRatio +=   $LevelDifference;
-                $Group -> GroupBaseAmount =  $Group -> RealtimeLevelDifference  * $this -> BaseAmount  * $PeerAwardTotalShare;
+                $Group -> GroupBaseAmount =  $Group -> RealtimeLevelDifference  * $this -> BaseAmount ;
                 $this -> AddLog('RealtimeLevelDifference ' . $Group -> RealtimeLevelDifference);
                 $this -> AddLog('BaseAmount ' . $this -> BaseAmount);
                 $this -> AddLog('GroupBaseAmount ' . $Group -> GroupBaseAmount);
@@ -137,45 +137,67 @@ class BonusPool4MarkerLvl extends  BonusPoolBase
             $CanDist = [];
             foreach ($Group -> BonusDict as $key2 => $value2) {
                 $CurrentItem = $value2;
-                if( $IsNeedSequential &&  $IsStart ){
+                if( $IsNeedSequential &&  $IsStart ){ //创客必是连续的才会有第二个人获奖
                     if(1  <  ($CurrentItem -> GuiderLayerNum  - $LastItem -> GuiderLayerNum  )){
                         break;
+                    }else{
+                        if( $CashCount <  $CashMax){
+                            $CurrentItem -> BounsTypeId = 80001000;
+                            $CashCount ++;
+                        }
                     }
                 }
                 if( $CashCount <  $CashMax){
-                    $CurrentItem -> BounsTypeId = 80001000;
-                    $CashCount ++;
+                    if(!$IsStart){
+                        $CurrentItem -> BounsTypeId = 80001000;
+                        $CashCount ++;
+                    }
                 }
+
                 $CanDist[] = $CurrentItem;
 
-                if( $GroupCanDistributeMax <=  count($CanDist)){
+                if( $GroupCanDistributeMax <  count($CanDist)){ // 每一级都有一个级差奖，所以还要额外多一个 ，所以 没有<=
                     break;
                 }
                 $LastItem  =  $value2;
                 $IsStart = true;
             }
             //防止除零错误
-            if(0 ==   count($CanDist)){
-                continue;
+//            if(1 >=   count($CanDist)){
+//                continue;
+//            }
+            //平级奖要扣除 每组当中第一个、级差奖
+            $PeerNum = count($CanDist) -1;
+            $PeerAmount = 0;
+            if(0< $PeerNum){
+                $PeerAmount =  $Group -> GroupBaseAmount  * $PeerAwardTotalShare/  $PeerNum;
             }
-            $PeerAmount =  $Group -> GroupBaseAmount /  count($CanDist);
-            foreach($CanDist as $it){
+            foreach($CanDist as $idx  => $it){
                 $BonusLog =  $it -> BonusLogModel ;
-                $BonusLog -> Bonus = $PeerAmount;
-                $BonusLog -> ChangeBonus = $PeerAmount;
                 $BonusLog -> AssetStatusId = 81002000;//资产状态
                 $BonusLog -> AssetStatusName = '等待&冻结';
+                $BonusLog -> Rmk = $this ->Rmk;
+                $BonusLog -> Rmk .= " ，来源用户：{$this->OriginUserModel->Id}({$this->OriginUserModel->RealityName})";
+                $BonusLog -> Rmk =mb_substr ( $BonusLog -> Rmk,0,500, 'utf-8');
                 if( 80001000  ==  $it-> BounsTypeId){
                     $BonusLog -> AssetTypeId =  80001000;  //资产类型
                     $BonusLog -> AssetTypeName = '现金';
-                    $BonusLog -> AssetModeId = 90001000; //资产模式
-                    $BonusLog -> AssetModeName = '报单奖';
-
                 }else{
                     $BonusLog -> AssetTypeId =  80002000;  //资产类型
                     $BonusLog -> AssetTypeName = '金果';
+                }
+                if(0 == $idx){
+                    $BonusLog -> AssetModeId = 90001000; //资产模式
+                    $BonusLog -> AssetModeName = '级差奖';
+                    $BonusLog -> Bonus =  $Group -> GroupBaseAmount ;
+                    $BonusLog -> ChangeBonus =  $Group -> GroupBaseAmount ;
+                }else{
+                    if(0 ==  $PeerNum)
+                        continue;
                     $BonusLog -> AssetModeId = 90002000; //资产模式
                     $BonusLog -> AssetModeName = '平级奖';
+                    $BonusLog -> Bonus = $PeerAmount;
+                    $BonusLog -> ChangeBonus = $PeerAmount;
                 }
                 $this-> BonusItems[] = $BonusLog;
             }

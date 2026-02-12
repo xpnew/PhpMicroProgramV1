@@ -14,13 +14,13 @@ use think\Model;
  * @property string $OpenId 微信OpenId
  * @property string $TokenId TokenId
  * @property string $Mobile 手机号
- * @property string $RealityName 实名
+ * @property string $RealityName 姓名
  * @property string $GuiderUserId 推荐人UserId
  * @property string $Account 账号
  * @property string $Password 密码
  * @property string $NickName 呢称
  * @property integer $IsBindPhone 已经绑定手机
- * @property integer $IsReality 是否已经实名
+ * @property integer $IsReality 是否已经姓名
  * @property integer $StoreId 商户Id 本项目未使用
  * @property integer $LockState 用来和其它Web通信的接口
  * @property string $RegPlatform 注册平台
@@ -93,13 +93,13 @@ class Client_UserT extends Model
 // OpenId  varchar 微信OpenId      varchar(64)     YES
 // TokenId varchar TokenId varchar(64)     YES
 // Mobile  varchar 手机号  varchar(30)     YES
-// RealityName     varchar 实名    varchar(150)    YES
+// RealityName     varchar 姓名    varchar(150)    YES
 // GuiderUserId    varchar 推荐人UserId    varchar(64)     YES
 // Account varchar 账号    varchar(64)     YES
 // Password        varchar 密码    varchar(64)     YES
 // NickName        varchar 呢称    varchar(120)    YES
 // IsBindPhone     int     已经绑定手机    int(11) YES
-// IsReality       int     是否已经实名    int(11) YES
+// IsReality       int     是否已经姓名    int(11) YES
 // StoreId int     商户Id 本项目未使用     int(11) YES
 // LockState       int     用来和其它Web通信的接口 int(11) YES
 // RegPlatform     varchar 注册平台        varchar(50)     YES

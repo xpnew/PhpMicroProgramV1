@@ -22,7 +22,7 @@ class MarketingLevel extends AdminBase
     }
     protected function _InitViewData(){
         parent::_InitViewData();
-        $this->assign('title', '推广级组');
+        $this->assign('title', '推广等级管理');
     }
     public function query(){
         $data =[  ];

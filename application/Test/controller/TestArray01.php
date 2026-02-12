@@ -88,6 +88,9 @@ class TestArray01
         echo '<br /> ===================<br/>';
 
     }
+
+
+
     public  function  test05(){
         $Amount  = null;
         $Point  = null;
@@ -132,6 +135,33 @@ class TestArray01
 
     }
 
+    public  function test07(){
+
+        $pro_ids = [7,8];
+
+        $Pros =  \app\Models\Product_InfoT::where('Id', 'in', $pro_ids) -> select();
+        $ProductId  = 7;
+        $FoundProduct =  FilterArrayOrCollection($Pros,  function($pro) use ($ProductId) { return $pro['Id'] == $ProductId; });
+        echo '<br /> ===================<br/>';
+        var_dump($FoundProduct);
+        echo '<br /> ===================<br/>';
+        dump($FoundProduct);
+        $ExistProduct = $this->  Filter2($Pros, $ProductId);
+        echo '<br /> ===================<br/>';
+        var_dump($ExistProduct);
+
+        echo '<br /> ===================<br/>';
+        dump($ExistProduct);
+    }
+
+    protected  function  Filter2($data,$ProductId){
+        foreach ($data as  $pro) {
+            if( $pro['Id'] == $ProductId){
+                return $pro;
+            }
+        }
+        return null;
+    }
 
     function FillArr($target,$def){
         foreach ($target as $k => &$v) {

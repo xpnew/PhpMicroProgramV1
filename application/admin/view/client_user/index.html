@@ -65,7 +65,7 @@
                                 </div>
                             </div>
                             <div class="layui-inline">
-                                <label class="layui-form-label">实名</label>
+                                <label class="layui-form-label">姓名</label>
                                 <div class="layui-input-inline">
                                     <input type="text" name="RealityName" id="RealityName" autocomplete="off" class="layui-input" />
                                 </div>
@@ -85,11 +85,57 @@
 
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-pwd" lay-event="SetPassword">密码</a>
+            <!-- <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="SetGift">发放礼包</a> -->
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑&查看</a>
         </script>
 
     </div>
+<div id="ID-test-layer-wrapper" style="display: none;">
+  <div style="padding:16px;">
+    弹出已经存在于页面中的一段元素<br>
+    通常是放置在 &lt;body&gt; 根节点下
+  </div>
+</div> <!-- 弹出层 demo end  -->
 
+<div id="SetPassPad" style="display: none;"> 
+    <form class="layui-form level3-form" action="" id="SetPassForm" lay-filter="SetPassForm">
+
+        <input  type="hidden" id="SetPassUserId" name="SetPassUserId" value="">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">新的密码</label>
+            <div class="layui-input-block layui-input-wrap">
+                <div class="layui-input-prefix layui-input-split">
+                <i class="layui-icon layui-icon-password"></i>
+                </div>                        
+                <input type="password" name="pwd" id="pwd" lay-verify="required|pass" lay-reqtext="新的密码不能为空" placeholder="请输入密码" value="" class="layui-input" lay-affix="eye">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">确认密码</label>
+            <div class="layui-input-block layui-input-wrap">
+                <div class="layui-input-prefix layui-input-split">
+                <i class="layui-icon layui-icon-password"></i>
+                </div>              
+                <input type="password" name="again_password" lay-verify="required|repass" lay-reqtext="新的密码不能为空" placeholder="确认密码" value="" class="layui-input" lay-affix="eye">
+            </div>
+        </div> 
+
+        <div class="layui-form-item  layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="" name="Remarks"  id="Remarks" autocomplete="off" class="layui-textarea"></textarea>
+            </div>
+        </div>        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="SetPassForm-submit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>      
+        </div>
+    </form>
+
+</div> <!-- OptLevel end -->
     <script src="__PUBLIC__lib/layui-v2.11.6/layui.js" charset="utf-8"></script>
     <script>
         layui.use(['form', 'table', 'jquery'], function () {
@@ -132,12 +178,11 @@
                         field: 'Id',title: '推广码',align: 'center'
                     },
                     {
-                        field: 'NickName', title: '呢称姓名', align: 'center',
-                        templet: function (d) { return DisplayMergeName(d.NickName,d.RealityName) }
+                        field: 'RealityName', title: '姓名', align: 'center',
                     },                      
                     {
                         field: 'MarketingLevelName',
-                        title: '级组名称',
+                        title: '等级',
                         align: 'center'
                     },
                     {
@@ -155,7 +200,7 @@
                         align: 'center'
                     },                    
                     {
-                        field: 'IsRegionAgent', title: '县代', align: 'center',
+                        field: 'IsRegionAgent', title: '区县代', align: 'center',
                         templet: function (d) { return DisplayIsEnable(d.IsRegionAgent) }
                     }, 
                     {
@@ -167,8 +212,8 @@
                         title: '头像',
                         align: 'center',
                         templet: function (d) {
-                            if (d.ClassTitPic01 && !CheckNull(d.ClassTitPic01)) {
-                                return '<img src="' + d.ProductPic + '" style="height:30px;" />';
+                            if (d.FaceImg && !CheckNull(d.FaceImg)) {
+                                return '<img src="' + d.FaceImg + '" style="height:30px;" />';
                             } else {
                                 return '';
                             }
@@ -264,33 +309,80 @@
                 };
             });
 
+
+
     /**
        * tool 右边操作区区 监听事件
        */
-            table.on('tool(currentTableFilter)', function (obj) {
+        table.on('tool(currentTableFilter)', function (obj) {
             var ModelData = obj.data;
             if (obj.event === 'edit') {  // 监听添加操作
-           var Path = '/{$Request.module}/{$Request.controller}/edit';
-            Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id;
-            var index = layer.open({
-                title: '{$title} - 修改' ,
-                type: 2,
-                shade: 0.2,
-                maxmin: true,
-                shadeClose: false,
-                area: ['90%', '90%'],
-                content: Path,
-            //    end: function () {
-            //        RefreshTable();
-            //    }
-            });
-            $(window).on("resize", function () {
-                layer.full(index);
-            });
+                var Path = '/{$Request.module}/{$Request.controller}/edit';
+                Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id;
+                var index = layer.open({
+                    title: '{$title} - 修改' ,
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: false,
+                    area: ['90%', '90%'],
+                    content: Path,
+                //    end: function () {
+                //        RefreshTable();
+                //    }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
                 return false;
-            
+            }else if(obj.event === 'SetGift'){
+                var ModelData = obj.data;
+                var Path = '/{$Request.module}/{$Request.controller}/SetGift';
+                Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id;
+                var index = layer.open({
+                    title: '发放礼包 - ' + DisplayMergeName(ModelData.NickName,ModelData.RealityName) ,
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['500px', '600px'],
+                    content: Path,
+                //    end: function () {
+                //        RefreshTable();
+                //    }
+                });
 
-            } else if (obj.event === 'delete') {
+
+            }else if(obj.event === 'SetPassword'){
+                var ModelData = obj.data;
+                $('#SetPassUserId').val(ModelData.Id);
+                $('#Remarks').val(ModelData.Remarks);
+                
+                layer.open({
+                    type: 1,
+                    shade: 0.3, // 不显示遮罩
+                    scrollbar: false,
+                    shadeClose: true,
+                    maxmin: true,
+                    area: ['500px', '400px'],
+                    title: '修改密码 - ' + DisplayMergeName(ModelData.NickName,ModelData.RealityName),
+                    content: $('#SetPassPad'), // 捕获的元素
+                    end: function(){
+                                         //表单初始赋值
+                        form.val('SetPassForm', {  
+                            "Id": ModelData.Id,
+                            "pwd": "",
+                            "again_password": "",       
+                            "Remarks": ModelData.Remarks                
+
+
+
+                        });
+                    }
+                });        
+
+            }            
+            else if (obj.event === 'delete') {
                 layer.confirm('您确定要删除所选数据吗', {
                     btn: ['是的', '取消'] //按钮
                 }, function () {
@@ -338,6 +430,83 @@
                     return;
                 });
                 }
+            });
+
+
+            form.verify({
+                pass: [
+                    /^[\S]{4,12}$/
+                    ,'密码必须4到12位，且不能出现空格'
+                ]
+                ,repass: function(value){
+                    Debug('repass  value :',value);
+                    Debug('repass  $("#pwd").val() :',$('#pwd').val());
+                    if(value != $('#pwd').val()){
+                        return '两次密码不一致';
+                    }
+                }
+            });   
+
+            //监听提交
+            form.on('submit(SetPassForm-submit)', function (data) {
+                console.log(data);
+                Debug(data);
+                if (CheckNull(data.field.pwd)) {
+                    layer.alert('必须指定 【新的密码】 ', { icon: 5 });
+                    return false;
+                }         
+                // let PostData = data.field;
+                let PostData = {...data.field, ClientUserId: $('#SetPassUserId').val()};
+                // console.log('data.field', JSON.stringify(data.field));                
+
+                // console.log('data.field',data.field);                
+                console.log('PostData',PostData);
+                // if (null != data) return false;
+                // 在JS当中，下面这行代出错了， 是因为 data.field 是一个对象，不能用 ...data.field吗？
+                // let PostData =[... data.field ]; 
+
+                $.ajax({
+                    url: '/{$Request.module}/{$Request.controller}/SetPassword',
+                    type: 'post',
+                    dataType: 'json',
+                    data: PostData,
+                    success: function (data) {
+                        console.log(data);
+                        //Info,Success,Warning,Error
+                        var type = data.Type;
+                        if (0 < data.StatusCode) {
+
+                            var oldData = table.cache["currentTableId"];
+                            Debug("oldData", oldData);
+                            Debug("ostData.ClientUserId", PostData.ClientUserId);
+                            let UserId = PostData.ClientUserId;
+                            UserId = parseInt(UserId);
+                            for (var i = 0; i < oldData.length; i++) {
+                                row = oldData[i];
+                                Debug('row.Id', row.Id);
+                                if (row.Id === UserId) {
+                                    Debug('has find row: ' + row.Id);
+                                    row.Remarks = PostData.Remarks;
+                                
+                                    // Debug("oldData", oldData);
+                                }
+                            };               
+                
+                            layer.msg(data.Title, { icon: 6, time: 2000 },
+                                function () {
+                                  layer.closeLast('page'); // 关闭最近一次打开的页面层
+
+                                });
+
+                        } else {
+                            layer.alert(data.Title, { icon: 5 });
+                        }
+                    }
+                });
+                //layer.alert(JSON.stringify(data.field), {
+                //    title: '最终的提交信息'
+                //})
+                return false;
             });
 
 

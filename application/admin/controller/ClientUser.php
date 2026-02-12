@@ -98,6 +98,57 @@ class ClientUser extends AdminBase
         return $this->SendQOk('查询成功',0,$data); //  查询返回  layer 专用的消息格式 QueryMsg
     }    
     /**
+     * 设置密码.
+     *
+     * @return \think\Response
+     */
+    public function SetPassword()
+    { 
+        $InputModel = $this->request->post();
+        $this -> SayLog('设置密码开始： ' , $InputModel);
+        if( !isset($InputModel['pwd'])   ){
+            return $this->SendJErr('参数错误: pwd');
+        }
+        if( !isset($InputModel['again_password'])   ){
+            return $this->SendJErr('参数错误: again_password');
+        }
+        if( !isset($InputModel['ClientUserId'])   ){
+            return $this->SendJErr('参数错误: ClientUserId');
+        }
+        $Password = $InputModel['pwd'];
+        $Remarks = input('post.Remarks'); 
+        $again_password = $InputModel['again_password'];
+
+        $ClientUserId = isset($InputModel['ClientUserId']) ? intval($InputModel['ClientUserId']) : 0;
+
+        if($Password != $again_password){
+            return $this->SendJErr('两次输入的密码不一致');
+        } 
+        $Password = trim($Password);
+
+        if($Password != $InputModel['pwd']){
+            return  $this -> SendJErr('密码不能包含空格');
+        }
+        $ExistUser =  Client_UserT::get($ClientUserId );
+        if(!$ExistUser){
+            return $this->SendJErr('用户不存在');
+        }
+        $Password = md5($Password);
+                // $InputModel['Password'] = $Password;
+        $ExistUser->Password = $Password;
+        $ExistUser->Remarks = $Remarks;
+        // $ExistUser->RegisterDate = date('Y-m-d H:i:s');
+        $ExistUser->save();
+        $ResultData = [
+            "ClientUserId" => $ClientUserId,
+
+            'pwd' => $InputModel['pwd'],
+            'again_password' => $InputModel['again_password'],
+
+        ];
+        return $this->SendJOk('保存成功',1, $ResultData);
+    }
+    /**
      * 显示创建资源表单页.
      *
      * @return \think\Response
@@ -440,6 +491,71 @@ class ClientUser extends AdminBase
         return $this->SendJOk('保存成功',1, $ResultData);
     } //OptBonus end
 
+
+
+    public function SetGift($id,$Id){
+        if(null == $id || null == $Id){
+            return $this->SendJErr('参数错误');
+        }
+        if(null == $Id){
+            $Id = $id;
+        }        
+                
+        $this -> _InitViewData();
+        if(!input('?id')){
+            return $this->error('参数错误');
+        }
+
+
+
+
+        $db= new \app\Models\Client_UserT();
+
+
+        $Model = $db->where(['Id'=>$Id])->find();
+        if(!$Model){
+            return $this->error('参数错误');
+        }   
+        $this-> SayLog('尝试输出： ' , $Model);
+
+
+        $ProductId = $this -> _CacheMng -> GetInt('MakerLevel2DefaultProductId', 0);
+        $MakerLevel3Require = $this -> _CacheMng -> GetDecimal('MakerLevel3Require', 0);
+        $ProductModel = \app\Models\Product_InfoV::get($ProductId);
+        if(null ==  $ProductModel){
+            return $this->error('参数错误：默认商品不存在');
+        }       
+        if(null== $ProductModel->DiscountPrice || 0 >= $ProductModel->DiscountPrice){
+            return $this->error('参数错误：商品市场价格异常');
+        }   
+        $BuildNum = ceil( $MakerLevel3Require / $ProductModel->DiscountPrice);
+
+
+
+        $this->assign('Model', $Model);
+        $this->assign('GiftProductId', $ProductId);
+        $this->assign('BuildNum', $BuildNum);
+        $this->assign('MakerLevel3Require', $MakerLevel3Require);
+        $this->assign('ProductInfo', $ProductModel);
+
+        return $this->fetch();
+
+        
+    }
+
+
+    public  function SetGiftSave(){
+        $InputModel = $this->request->post();
+        $ClientId = isset($InputModel['ClientId']) ? intval($InputModel['ClientId']) : 0;
+        $ProductId = isset($InputModel['ProductId']) ? intval($InputModel['ProductId']) : 0;
+        $DB= new \app\Models\Client_UserT();
+
+        
+        // dump($InputModel);
+        // die();
+
+
+    }
 
     /**
      * 保存更新的资源

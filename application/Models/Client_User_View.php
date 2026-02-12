@@ -12,7 +12,7 @@ use think\Model;
  *
  * @property-read \Illuminate\Database\Eloquent\Builder|static where(string $column, mixed $value)
  * @property string $MarketingLevelName 级组名称
- * @property string $GuiderRealName 实名
+ * @property string $GuiderRealName 姓名
  * @property string $GuiderNickName 呢称
  */
 class Client_User_View extends  Client_UserT
@@ -36,13 +36,13 @@ class Client_User_View extends  Client_UserT
 // OpenId  varchar 微信OpenId      varchar(64)     YES
 // TokenId varchar TokenId varchar(64)     YES
 // Mobile  varchar 手机号  varchar(30)     YES
-// RealityName     varchar 实名    varchar(150)    YES
+// RealityName     varchar 姓名    varchar(150)    YES
 // GuiderUserId    varchar 推荐人UserId    varchar(64)     YES
 // Account varchar 账号    varchar(64)     YES
 // Password        varchar 密码    varchar(64)     YES
 // NickName        varchar 呢称    varchar(120)    YES
 // IsBindPhone     int     已经绑定手机    int(11) YES
-// IsReality       int     是否已经实名    int(11) YES
+// IsReality       int     是否已经姓名    int(11) YES
 // StoreId int     商户Id 本项目未使用     int(11) YES
 // LockState       int     用来和其它Web通信的接口 int(11) YES
 // RegPlatform     varchar 注册平台        varchar(50)     YES
@@ -87,7 +87,7 @@ class Client_User_View extends  Client_UserT
 // BounsBalance    decimal 奖金余额        decimal(18,4)   YES
 // BounsFrozen     decimal 奖金冻结数额    decimal(18,4)   YES
 // IsRegionAgent   bit     是否为区县代理  bit(1)  YES
-// GuiderRealName  varchar 实名    varchar(150)    YES
+// GuiderRealName  varchar 姓名    varchar(150)    YES
 // GuiderNickName  varchar 呢称    varchar(120)    YES
 
 ?>

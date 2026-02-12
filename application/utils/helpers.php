@@ -159,8 +159,66 @@ if (!function_exists('SetModel4Names')) {
     }
 }
 
+if (!function_exists('FilterModelAttr')) {
+    /**
+     * 为对象设置属性值（如果属性不存在或值为空）
+     * @param \think\Collection $lst 对象引用
+     * @param string $propertyName 属性名
+     * @return array
+     */
+    function FilterModelAttr($lst, string $propertyName)
+    {
+        $Result = [];
+        foreach ($lst as $item) {
+            $Result[] = $item -> $propertyName ;
+        }
+        return $Result;
+    }
+}
+
+if (!function_exists('FilterArrayOrCollection')) {
+    /**
+     * 兼容处理数组和ThinkPHP集合的过滤函数
+     * 功能与 array_filter 一致，但支持对象集合
+     * @param mixed  $data 需要过滤的数据 (数组或 \think\Collection 对象)
+     * @param callable|null  $callback 过滤回调函数
+     * @return array 过滤后的数组
+     */
+    function FilterArrayOrCollection( $data, callable  $callback = null) {
+        // 情况1: 如果是ThinkPHP集合对象
+        if ( $data instanceof \think\Collection) {
+            // 如果有回调函数，使用集合自带的filter方法，然后转为数组
+            if ( $callback) {
+                return  $data->filter( $callback);
+            }
+            // 如果没有回调，直接转为数组（相当于保留所有）
+            return  $data->toArray();
+        }
+
+        // 情况2: 如果是普通数组，直接使用原生array_filter
+        if (is_array( $data)) {
+            // 注意：原生array_filter如果回调为空，会移除空值。这里保持与原生一致。
+            return array_filter( $data,  $callback);
+        }
+
+        // 情况3: 如果是其他对象 (如stdClass)，尝试强制转换为数组再过滤
+        if (is_object( $data)) {
+            $arrayData = (array)  $data;
+            return array_filter( $arrayData,  $callback);
+        }
+
+        // 兜底：如果是字符串、数字等，包装成数组或返回空数组
+        return [];
+    }
+}
+
 if (!function_exists('FillArr2Model')) {
-    function FillArr2Model($arr,object &$obj){
+    /**通过数组为模型赋值
+     * @param $arr 带数据的数组
+     * @param object $obj 需要填充数据的模型
+     * @return void
+     */
+    function FillArr2Model($arr, object &$obj){
         if($obj instanceof \think\Model){
             $ModelData = $obj->getData();
             foreach ($arr as $k => $v) {

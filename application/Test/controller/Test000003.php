@@ -1,5 +1,5 @@
 <?php
-namespace app\test\controller;
+namespace app\Test\controller;
 use think\Controller;
 use Ramsey\Uuid\Uuid;
 

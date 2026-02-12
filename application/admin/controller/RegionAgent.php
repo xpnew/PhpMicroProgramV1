@@ -98,7 +98,7 @@ class RegionAgent extends AdminBase
         $Model -> RegionName = ''; // 地区名称
         $Model -> AgentLevel = 0;  // 代理等级：1 省 2 市  3县
         $Model -> NickName = ''; // 呢称
-        $Model -> RealityName = ''; // 实名
+        $Model -> RealityName = ''; // 姓名
         $Model -> Mobile = ''; // 手机号
         $Model -> CreateTime = ''; // 创建时间
         $Model -> UpdateTime = ''; // 修改时间

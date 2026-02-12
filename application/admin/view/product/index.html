@@ -104,6 +104,11 @@
                         title: '序号'
                     },
                     {
+                        field: 'ProductZoneName',
+                        title: '所在分区',
+                        align: 'center'
+                    },                    
+                    {
                         field: 'ClassName',
                         title: '分类名称',
                         align: 'center'
@@ -113,11 +118,7 @@
                         title: '商品名称',
                         align: 'center'
                     },
-                    {
-                        field: 'ProductZoneName',
-                        title: '所在分区',
-                        align: 'center'
-                    },
+
                     {field: 'Tags', title: '标签', align: 'center',templet: function (d) {
                             return Tags2Arr(d.Tags).join('、');
                         }},
@@ -145,7 +146,11 @@
                         }
                     },
                    
-
+                    {
+                        field: 'Id',
+                        title: '编号',
+                        align: 'center'
+                    },
 
                     {
                         title: '操作',

@@ -1,6 +1,7 @@
 <?php
 namespace app\api\controller;
 
+use app\utils\UserQrBuilder;
 use think\Controller;
 use think\Request;
 use app\Comm\Token\TokenItem;
@@ -145,6 +146,30 @@ class User extends ApiBase
         return $this->SendJOk('更新成功',1,$data);
 
 
+    }
+
+
+    public function GetQr(){
+        $UserId = input('UserId',-9999);
+        if($UserId == -9999 ){
+            return $this->SendJErr('参数错误');
+        }
+        $id = $UserId;
+        $Src =  "/UserQr/{$id}.png";
+        $RealPath = \app\utils\PathConverter::ToStoragePath($Src);
+        if(file_exists($RealPath)){
+            $this -> Msg -> Body = $Src;
+            return  $this->SendJOk('获取二维码成功（已经存在）',1,$Src);
+        }
+
+        $Mng =  \app\Comm\WxTokenMng::getIns();
+        $Token =  $Mng -> GetToken();
+        $qb=  new UserQrBuilder($Token);
+
+        $qb -> Build("/pages/about/index?id={$id}",430);
+
+        $qb -> Save($RealPath);
+        return  $this->SendJOk('获取二维码成功',1,$Src);
     }
 
     /// 统计订单

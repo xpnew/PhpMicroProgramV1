@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="__PUBLIC__css/pagescss/butjumpup.css" />
     <script type="text/javascript" src="__PUBLIC__scripts/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="__PUBLIC__scripts/comm.js"></script>
+    <script type="text/javascript" src="__PUBLIC__scripts/admin_comm.js"></script>
 
 </head>
 <body>
@@ -20,52 +21,43 @@
             </fieldset>
 
             <form class="layui-form" action="" lay-filter="MainForm">
-                <input type="hidden" name="Id" id="Id" value="0" /><!-- Id主键 -->
-                <input type="hidden" name="ClassTitPic01" id="ClassTitPic01" /><!-- Id主键 -->
-                <input type="hidden" name="IsNeedSequential" id="IsNeedSequential" /><!-- Id主键 -->
-                <input type="hidden" name="EnableBuildPoint" id="EnableBuildPoint" /><!-- Id主键 -->
-                <input type="hidden" name="EnablePointBuy" id="EnablePointBuy" /><!-- Id主键 -->
-
+                <input type="hidden" name="ClientId" id="ClientId" value="{$Model.Id}" /><!-- Id主键 -->
+                <input type="hidden" name="MakerLevel3Require" id="MakerLevel3Require" value="{$MakerLevel3Require}   " />
+                <input type="hidden" name="ProductId" id="ProductId" value="{$ProductInfo.Id}" />
              
 
                 <div class="layui-form-item">
                     <div class="layui-inline">
-                        <label class="layui-form-label">等级名称</label>
+                        <label class="layui-form-label">商品名称/单价</label>
                         <div class="layui-input-inline">
-                            <input type="text" name="LevelName" lay-verify="required" autocomplete="off" class="layui-input" />
+                           {$ProductInfo.ProductName} / {$ProductInfo.DiscountPrice}
                         </div>
                     </div>
                     <div class="layui-inline">
-                        <label class="layui-form-label">级差</label>
+                        <label class="layui-form-label">会员</label>
                         <div class="layui-input-inline">
-                            <input type="text" name="LevelDifference" lay-verify="required" autocomplete="off" class="layui-input" />
+                            {$Model.RealityName} {$Model.NickName}
                         </div>
                     </div>
                 </div>
-                <div class="layui-form-item">
-                    <div class="layui-inline">
-                        <label class="layui-form-label">平级奖人数</label>
-                        <div class="layui-input-inline">
-                            <input type="text" name="PeerAwardMax" lay-verify="required" autocomplete="off" class="layui-input" />
-                        </div>
-                    </div>
 
-                </div>
                 <div class="layui-form-item">
                     <div class="layui-inline">
-                        <label class="layui-form-label">连续要求</label>
+                        <label class="layui-form-label">生成数量</label>
                         <div class="layui-input-inline">
-                            <input type="checkbox" name="SwitchIsNeedSequential" lay-skin="switch" lay-filter="SwitchIsNeedSequential" {if( 1 == $Model.IsNeedSequential)}  checked {/if} title="是|否">
+                            <input type="text" name="BuildNum" id="BuildNum" value="{$BuildNum}" class="layui-input" placeholder="请输入生成数量">
                         </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">订单价格</label>
+                        <div class="layui-input-inline">
+                            {$MakerLevel3Require}
+                        </div>                           
                     </div>
                     
                 </div>
-                <div class="layui-form-item layui-form-text">
-                    <label class="layui-form-label">备注</label>
-                    <div class="layui-input-block">
-                        <textarea placeholder="请输入内容" name="Remarks" class="layui-textarea"></textarea>
-                    </div>
-                </div>
+
+
 
                 <div class="layui-form-item">
                     <div class="layui-input-block">
@@ -92,17 +84,6 @@
 
 
 
-        // 指定开关事件
-        form.on('switch(SwitchIsNeedSequential)', function(data){
-            // layer.msg('开关 SwitchIsNeedSequential '+ (this.checked ? 'true' : 'false'), {
-            //     offset: '6px'
-            // });
-            $('#IsNeedSequential').val(this.checked ? '1' : '0');
-            layer.tips(' 允许获取奖励 温馨提示, 新值 ：' + $('#IsNeedSequential').val(), data.othis)
-            // layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是 ON|OFF', data.othis)
-        });
-
-
 
         //监听提交
         form.on('submit(demo1)', function (data) {
@@ -116,7 +97,7 @@
             // if (null != data) return false;
 
             $.ajax({
-                url: '/{$Request.module}/{$Request.controller}/save',
+                url: '/{$Request.module}/{$Request.controller}/{$Request.action}Save',
                 type: 'post',
                 dataType: 'json',
                 data: data.field,
@@ -147,18 +128,6 @@
             return false;
         });
 
-
-        //表单初始赋值
-        form.val('MainForm', {
-
-            "Id": "{$Model->Id}" //Id主键
-            , "LevelName": "{$Model->LevelName}" //等级名称
-            , "LevelDifference": "{$Model->LevelDifference|default=''}" //级差       
-            , "IsNeedSequential": "{$Model->IsNeedSequential|default='0'}" //连续要求
-            , "PeerAwardMax": "{$Model->PeerAwardMax|default='0'}" //平级奖人数
-            , "Remarks": "{$Model->Remarks|default=''}" //备注
-
-        })
 
 
 

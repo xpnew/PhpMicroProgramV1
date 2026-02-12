@@ -122,7 +122,7 @@ ON T0.Id = T1.ParentMarkerId  order by T0.Id DESC";
                 ->field('T0.*')
                 // 2. 关联子查询
                 // 注意：view方法的第二个参数是'inner'，第四个参数是关联条件
-                ->view([ $subQuery => 'T1'], 'SonMarkerNum', 'T0.Id = T1.ParentMarkerId', 'inner')
+                ->view([ $subQuery => 'T1'], 'SonMarkerNum', 'T0.Id = T1.ParentMarkerId', 'INNER')
                 // ★ where 是附加条件
                 -> where($where)
                 // 3. 多字段排序 (字符串写法)
@@ -136,7 +136,7 @@ ON T0.Id = T1.ParentMarkerId  order by T0.Id DESC";
         // 注意：这里为了准确，通常建议使用 count(*)，ThinkPHP会自动处理
          $totalCount = Db::table('Client_User_View')
                     ->alias('T0')
-                    ->view([ $subQuery => 'T1'], '', 'T0.Id = T1.ParentMarkerId', 'inner')
+                    ->view([ $subQuery => 'T1'], '', 'T0.Id = T1.ParentMarkerId', 'INNER')
                     // ★ where 是附加条件
                     -> where($where)
                     ->count(); // 获取总条数
@@ -147,6 +147,71 @@ ON T0.Id = T1.ParentMarkerId  order by T0.Id DESC";
         //return $this->SendQOk2('查询成功',$this->RecordCount,$data); //  查询返回  layer 专用的消息格式 QueryMsg
         return $this->SendQOk('查询成功',0,$data); //  查询返回  layer 专用的消息格式 QueryMsg
     }
+
+    /**
+     * 为代理升级查询 下级代理
+     */
+    public function miniquery(){
+        $data =[  ];
+        $BeginTime = input('BeginTime','');
+        $EndTime = input('EndTime','');
+
+        $Account = input('Account','');
+        $Mobile = input('Mobile','');
+        $NickName = input('NickName','');
+        $RealityName = input('RealityName',''); 
+        
+        $GuiderUserId = input('GuiderUserId','');
+
+
+        $PageIndex = input('PageIndex',1);
+        $PageSize = input('PageSize',15); // 每页显示数量
+
+
+        $where = [];
+        if($NickName != ''){
+            $where[] = ['NickName','like','%'.$NickName.'%'];
+        }else{
+            $where[] = ['Id','>',0];
+
+        }
+
+        if('' != $BeginTime ){
+            $where[] = ['RegisterDate','>=',$BeginTime . ' 00:00:00' ];
+        }
+        if('' != $EndTime ){
+            $EndTime = new \DateTime($EndTime . ' 00:00:00');
+            $EndTime -> modify('+1 day');
+            $EndTime = $EndTime -> format('Y-m-d H:i:s');
+            $where[] = ['RegisterDate','<',$EndTime ];
+        }
+         if($GuiderUserId != ''){
+             $where[] = ['GuiderUserId','=',$GuiderUserId];
+         }
+
+        if($NickName != ''){
+            $where[] = ['NickName','like','%'.$NickName.'%'];
+        }        
+      
+        if($RealityName != ''){
+            $where[] = ['RealityName','like','%'.$RealityName.'%'];
+        }        
+        if($Mobile != ''){
+            $where[] = ['Mobile','like','%'.$Mobile.'%'];
+        }        
+
+        $Client_UserT= new \app\Models\Client_User_View();
+
+        $data = $Client_UserT -> where($where) 
+        -> order(['MakerLevelId'=>'desc','Id'=>'desc'])
+        -> limit( ( $PageIndex-1) * $PageSize, $PageSize)  ->select();
+        $data = $data->toArray();    
+        // 返回数据      
+        $this->RecordCount = $Client_UserT -> where($where) -> count();
+        //return $this->SendQOk2('查询成功',$this->RecordCount,$data); //  查询返回  layer 专用的消息格式 QueryMsg
+        return $this->SendQOk('查询成功',0,$data); //  查询返回  layer 专用的消息格式 QueryMsg
+    }    
+
     /**
      * 显示编辑资源表单页.
      *

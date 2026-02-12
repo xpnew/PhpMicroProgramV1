@@ -68,18 +68,18 @@ class ClientAddress extends ApiBase
         $Id = isset($InputModel['Id']) ? intval($InputModel['Id']) : 0;
 
         $IsNew = $Id == 0;
-
-        $where = [];
-        $where[] = ['AddressName','=',$InputModel['AddressName']];
-        $where[] = ['UserId','=',$UserId];
         $DB= new \app\Models\Client_AddressT();
-        $Exist = $DB -> where($where) ->find();
-        if($Exist != null){
-           if($IsNew)
-                return $this->SendJErr('同名地地址已存在');
-            else if($Exist -> Id != $Id)
-                return $this->SendJErr('同名地地址已存在'); 
-        }
+//        $where = [];
+//        $where[] = ['AddressName','=',$InputModel['AddressName']];
+//        $where[] = ['UserId','=',$UserId];
+
+//        $Exist = $DB -> where($where) ->find();
+//        if($Exist != null){
+//           if($IsNew)
+//                return $this->SendJErr('同名地地址已存在');
+//            else if($Exist -> Id != $Id)
+//                return $this->SendJErr('同名地地址已存在');
+//        }
         $InputModel['UserId'] = $UserId;
 
         // $pro = \app\Models\Product_InfoT::get($id);

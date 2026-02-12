@@ -60,8 +60,6 @@ class BonusMng{
 
         }
 
-        $ResultPool -> DistributeBonus();
-        $ResultPool -> Save();
 
         return $ResultPool;
 
@@ -116,7 +114,7 @@ class BonusMng{
 
     public  function  MkBonusLog($user,$order){
         $NewBonus = new \app\Models\Client_BonusLogT();
-        $NewBonus -> CreateTime =  new \DateTime();
+//        $NewBonus -> CreateTime =  new \DateTime();
         $NewBonus -> ClientUserId =  $user -> Id;
         $NewBonus -> ClientNickName =  $user -> NickName;
         $NewBonus -> ClientRealName =  $user -> RealityName;
@@ -125,7 +123,7 @@ class BonusMng{
         $NewBonus -> OrderNo =  $order-> OrderNo;
 
         $NewBonus -> TotalPrice = $order-> PayPrice;
-
+        $NewBonus -> CreateTime =  date('Y-m-d H:i:s');
         return $NewBonus;
     }
 

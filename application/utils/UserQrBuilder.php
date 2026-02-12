@@ -2,13 +2,11 @@
 
 namespace app\utils;
 
-<?php
-
 /**
  * UserQrBuiler
  * 用于根据微信小程序参数生成小程序二维码
  */
-class UserQrBuiler {
+class UserQrBuilder {
 
     private $accessToken;
     private $lastError = '';
@@ -43,6 +41,7 @@ class UserQrBuiler {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // 忽略SSL证书验证（生产环境建议开启）
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 
@@ -130,19 +129,19 @@ class UserQrBuiler {
 
 // --- 调用示例 ---
 
-// 1. 实例化
-$Token = 'YOUR_ACCESS_TOKEN_HERE'; // 替换为真实的Token
-$qb = new UserQrBuiler($Token);
-
-// 2. 按照你的要求调用：先Build生成，再Save保存
-// 注意：Build现在接收你指定的路径和宽度
-$qb->Build('/pages/about/index?id=96', 430);
-
-// 3. 保存成图片
-if ($qb->Save('@/Public/UserQr/96.png')) {
-    echo "二维码生成并保存成功！";
-} else {
-    echo "失败: " . $qb->getLastError();
-}
+//// 1. 实例化
+//$Token = 'YOUR_ACCESS_TOKEN_HERE'; // 替换为真实的Token
+//$qb = new UserQrBuiler($Token);
+//
+//// 2. 按照你的要求调用：先Build生成，再Save保存
+//// 注意：Build现在接收你指定的路径和宽度
+//$qb->Build('/pages/about/index?id=96', 430);
+//
+//// 3. 保存成图片
+//if ($qb->Save('@/Public/UserQr/96.png')) {
+//    echo "二维码生成并保存成功！";
+//} else {
+//    echo "失败: " . $qb->getLastError();
+//}
 
 ?>

@@ -36,6 +36,8 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
     public  $RepeatPurchaseRatio  = 100.0; //复购结算比例
 
     public  $OrderClass;
+    /** @var string $Rmk 奖金记录的基础备注 */
+    protected  $Rmk;
 
     protected  $CacheMng;
 
@@ -118,6 +120,10 @@ abstract class BonusPoolBase extends \app\Comm\CommMsg
         }
     }
 
+
+    public  function SetRmk($rmk){
+        $this -> Rmk = $rmk;
+    }
     abstract protected function  LoopGuider($GuiderId);
 
     ///获取全部的奖金项

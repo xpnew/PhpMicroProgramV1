@@ -71,7 +71,7 @@
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">实名</label>
+                            <label class="layui-form-label">姓名</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="RealityName" id="RealityName" autocomplete="off" class="layui-input" />
                             </div>
@@ -293,7 +293,7 @@
         table.on('tool(currentTableFilter)', function (obj) {
             var ModelData = obj.data;
             if (obj.event === 'edit') {  // 监听添加操作
-                var Path = '/{$Request.module}/ClientUser/edit';
+                var Path = '/{$Request.module}/{$Request.controller}/edit';
                 Path += '?_dx=' + Math.random() + '&id=' + ModelData.Id + '&IsLevelUp=1';
                 var index = layer.open({
                     title: '{$title} - 修改' ,
@@ -319,13 +319,36 @@
 
 
         function RefreshTable() {
-            console.log('RefreshTable');
+            console.log('MarkingUp  RefreshTable ');
+            var BeginTime = ExpiryDate(0);
+            var EndTime = ExpiryDate(1);
+
+            var LoginName = $("input[name='LoginName']").val();
+            var NickName = $("input[name='NickName']").val();
+            var RealityName = $("input[name='RealityName']").val();
+            var Mobile = $("input[name='Mobile']").val();
+            var MakerLevelId = $('#MakerLevelId').val();
+            var ParentMarkerId = $('#ParentMarkerId').val();
+
+            if(CheckNull(ParentMarkerId)){
+                layui.msg('必须选择一个目标等级',{icon: 2});
+                return false;
+            }
+
             table.reload('currentTableId', {
+                method: 'post',
                 where: {
-                    //name: $('#name').val()
+                    "BeginTime": BeginTime,
+                    "EndTime": EndTime,
+                    'LoginName': LoginName,
+                    'NickName': NickName,
+                    'Mobile': Mobile,
+                    'RealityName': RealityName,
+                    'MakerLevelId': MakerLevelId,
+                    'ParentMarkerId': ParentMarkerId,
                 }
             }, 'data');
-
+            return false;
         }
         // 按ESC键关闭侧边栏
         document.addEventListener('keydown', (e) => {
@@ -339,12 +362,36 @@
 
 
     function ReloadList() {
-        console.log('ReloadList');
-        layui.table.reload('currentTableId', {
-            where: {
-                //name: $('#name').val()
+        console.log('MarkingUp ReloadList');
+            var BeginTime = ExpiryDate(0);
+            var EndTime = ExpiryDate(1);
+
+            var LoginName = $("input[name='LoginName']").val();
+            var NickName = $("input[name='NickName']").val();
+            var RealityName = $("input[name='RealityName']").val();
+            var Mobile = $("input[name='Mobile']").val();
+            var MakerLevelId = $('#MakerLevelId').val();
+            var ParentMarkerId = $('#ParentMarkerId').val();
+
+            if(CheckNull(ParentMarkerId)){
+                layui.msg('必须选择一个目标等级',{icon: 2});
+                return false;
             }
-        }, 'data');
+
+            layui.table.reload('currentTableId', {
+                method: 'post',
+                where: {
+                    "BeginTime": BeginTime,
+                    "EndTime": EndTime,
+                    'LoginName': LoginName,
+                    'NickName': NickName,
+                    'Mobile': Mobile,
+                    'RealityName': RealityName,
+                    'MakerLevelId': MakerLevelId,
+                    'ParentMarkerId': ParentMarkerId,
+                }
+            }, 'data');
+            return false;
     }
     $(function () {
         $('#BtShowAll').click(function () {

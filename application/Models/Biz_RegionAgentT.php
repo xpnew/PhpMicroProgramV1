@@ -8,6 +8,29 @@ use think\Model;
 /// 文件 名带下划线的 读取不到！！！
 
 
+/**
+ * 区域代理（暂时是区县代理）
+ * @package App\Models
+ * @table Biz_RegionAgentT
+ *
+ * @property-read \Illuminate\Database\Eloquent\Builder|static where(string $column, mixed $value)
+ * @property integer $Id Id
+ * @property integer $ClientUserId 客户Id
+ * @property integer $ProvinceId 省Id
+ * @property integer $CityId 市Id
+ * @property integer $CountyId 县Id
+ * @property string $RegionName 地区名称
+ * @property integer $AgentLevel 代理等级：1 省 2 市  3县
+ * @property string $NickName 呢称
+ * @property string $RealityName 姓名
+ * @property string $Mobile 手机号
+ * @property string $CreateTime 创建时间
+ * @property string $UpdateTime 修改时间
+ * @property string $CommenceTime 开始时间
+ * @property string $ExpireStopTime 过期时间
+ * @property string $InaugurateTime 首次合作开始时间
+ * @property string $Rmk 备注
+ */
 class Biz_RegionAgentT extends Model
 {
     protected $table = 'Biz_RegionAgentT';
@@ -34,7 +57,7 @@ class Biz_RegionAgentT extends Model
 // RegionName      varchar 地区名称        varchar(150)    YES
 // AgentLevel      int     代理等级：1 省 2 市  3县        int(11) YES
 // NickName        varchar 呢称    varchar(120)    YES
-// RealityName     varchar 实名    varchar(150)    YES
+// RealityName     varchar 姓名    varchar(150)    YES
 // Mobile  varchar 手机号  varchar(30)     YES
 // CreateTime      datetime        创建时间        datetime        YES
 // UpdateTime      datetime        修改时间        datetime        YES
@@ -45,4 +68,3 @@ class Biz_RegionAgentT extends Model
 
 
 ?>
-

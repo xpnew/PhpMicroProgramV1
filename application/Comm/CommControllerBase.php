@@ -187,6 +187,19 @@ class CommControllerBase extends Controller
     }
 
 
+    protected  function _GetName(){
+
+        $Name1 = get_class($this);
+        $Name2 = '';
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+        if (isset($trace[1]['function'])) {
+            $Name2  = $trace[1]['function'];
+        }
+
+        return 'Class: ' .$Name1 .' Method: ' .$Name2;
+    }
+
+
 }
 
 

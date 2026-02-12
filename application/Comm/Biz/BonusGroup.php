@@ -10,7 +10,14 @@ class BonusGroup{
     public  $Name ;
 
     public  $GroupIdx = 0;
-    public  $GroupBaseAmount; //组内计算基数
+
+    /**
+     * @var float @GroupBaseAmount 组内计算基数
+     */
+    public  $GroupBaseAmount = 0.0;
+
+    /** @var float $GroupPeerAmount 组内平级奖 */
+    public  $GroupPeerAmount = 0.0 ;
 
     public  $MarketingLevel; //级组
 

@@ -49,13 +49,42 @@ class UserBonus extends ApiBase
  
         $DB= new PageDBModel();
 
-        $data = $DB -> where($where) 
+        $data = $DB
+            ->alias('T0')
+            -> join('Client_OrderT T1','T0.OrderId=T1.Id','LEFT')
+            -> join('Client_UserT T2','T1.UserId=T2.Id','INNER')
+            -> where($where)
+            -> field('T0.*,T2.NickName AS ConsumerNickName,T2.RealityName AS ConsumerRealName,T2.Mobile AS ConsumerMobile,T2.FaceImg AS ConsumerFaceImg')
         -> order(['Id'=>'desc'])
         -> limit( ( $PageIndex-1) * $PageSize, $PageSize)  ->select();
         $data = $data->toArray();    
         // 返回数据      
         return $this->SendJOk('查询成功',1,$data); 
-    }    
+    }
+    public function RecordCount(){
+
+        $UserId = input('UserId','');
+        $AssetTypeId = input('AssetTypeId','');
+        $where = [];
+        if($UserId != ''){
+            $where[] = ['ClientUserId','=',$UserId];
+        }
+
+        if($AssetTypeId != ''){
+            $where[] = ['AssetTypeId','=',$AssetTypeId];
+        }
+
+        $DB= new PageDBModel();
+        $data = $DB
+            ->alias('T0')
+            -> join('Client_OrderT T1','T0.OrderId=T1.Id','LEFT')
+            -> join('Client_UserT T2','T1.UserId=T2.Id','INNER')
+            -> where($where)
+            ->count();
+
+        // 返回数据
+        return $this->SendJOk('查询成功',1,$data);
+    }
     public function Save()
     {
 

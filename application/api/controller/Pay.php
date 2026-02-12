@@ -84,10 +84,10 @@ class Pay extends ApiBase
         $PayBill -> CallbackURL = WxPayConfig::NOTIFY_URL;
         // $PayBill -> BillURL = request()->domain() . '/api/PayNotice/Handle';
 
-        $PayBill -> Isfinish = 0;
+
         $PayBill -> IsAudit = 0;
         $PayBill -> IsSuccess = 0;
-        $PayBill -> Isfinish = 0;
+
         $PayBill -> Isfinish = 0;
 
         $PayBill -> save();

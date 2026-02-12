@@ -3,15 +3,18 @@
 namespace app\api\controller;
 
 use app\Comm\Biz\BonusMng;
+use app\Comm\Biz\OrderPayEntity;
 use think\Controller;
 use think\Request;
 use \app\Models\Client_OrderItemT;
 use \app\Models\Client_OrderT;
 use \app\Models\Client_BuyCarItemT;
 use \app\Models\Product_InfoT;
-use \app\Models\Client_UserT;
+
 use \app\Models\Client_BonusLogT;
 use \app\utils\GeneralTool;
+
+
 use \app\Models\Client_UserT as UserDB;
 
 use \app\Models\Product_InfoV as ProductInfoV;
@@ -110,7 +113,7 @@ class Order extends ApiBase
         $db =  new Client_OrderT();
         $NewOrder = [
             'UserId' => $UserId,
-            'OrderNo' => GeneralTool::CreateGuid(),
+            'OrderNo' => GeneralTool::GetBillNo(),
             'CreateTime' => date('Y-m-d H:i:s'),
             'UpdateTime' => date('Y-m-d H:i:s'),
             'OrderStatus' => 10001000, //10001000 未完成 ;10005000 已经完成  etc.
@@ -223,7 +226,7 @@ class Order extends ApiBase
         }
         $ProductZoneName = '';
         $ZoneTypeDef =  \app\Models\Sys_TypeDefinedT::get($ProductZoneId);
-        if(null == $ZoneTypeDef){
+        if(null != $ZoneTypeDef){
             $ProductZoneName = $ZoneTypeDef -> TypeName;
         }
         $NewOrder['TotalPrice'] = $TotalPrice;
@@ -259,8 +262,7 @@ class Order extends ApiBase
     }
 
 
-    protected  $IsPreferredZone;
-    protected  $CurrentProductClass;
+
     protected  $Input ; // 注意添加 & 按引用 传递
 
     public function TestPayOrder(){
@@ -275,188 +277,24 @@ class Order extends ApiBase
         if($OrderId == 0 || $UserId == 0){
             return $this->SendJErr('参数错误');
         }
-        $db =  new Client_OrderT();
-        $order = $db -> where(['Id'=>$OrderId,'UserId'=>$UserId]) -> find();
-        if($order == null){
-            return $this->SendJErr('订单不存在');
+        $op =  new  OrderPayEntity($OrderId,$UserId , $this ->request);
+
+        $op -> SetAddress($ClientName,$ClientPhone,$ClientAddress,$ClientRegionId);
+
+        if(0>= $op -> StatusCode){
+            return $this->SendJErr($op -> Title);
         }
-        $this -> CurrentOrder = $order;
-
-        if($order -> OrderStatus != 10001000){
-            return $this->SendJErr('订单状态不正确，不能支付');
-        }
-        $ExistUser =  Client_UserT::get($UserId );
-        $this-> CurrentUser = $ExistUser;
-
-        if(!$ExistUser){
-            return $this->SendJErr('用户不存在');
-        }
-        $dbitems =  Client_OrderItemT:: where('OrderId', $OrderId) -> select();
-
-        $order -> Items = $dbitems;
-
-        if( !isset($this -> CurrentProductClass)){
-            $this -> CurrentProductClass = $this -> GetProductClass();
-        }
-        if( !isset($this -> IsPreferredZone)){
-            $this -> IsPreferredZone = $this -> GetIsPreferredZone();
-        }
-
-
 
         $InputModel = $this->request->post();
-        $this -> Input = &$InputModel; //按引用传递
-
-        $InputModel['OrderNo'] =   $order-> OrderNo ;
-        $InputModel['TotalPrice'] =   $order-> PayPrice ;
-        $InputModel['ClientRealName'] =  $ExistUser-> RealityName;
-        $InputModel['ClientNickName'] =   $ExistUser-> NickName;
-        $InputModel['ClientPhone'] =   $ExistUser-> Mobile ;
-        $InputModel['ClientUserId'] = $UserId;
-        $InputModel['Rmk'] = $this ->  _BuildOrderRmk();
-        $InputModel['CreateTime'] = date('Y-m-d H:i:s');
-//        $this -> SayLog('输入信息 ：', $InputModel);
-//        $this -> SayLog('输入信息 $this -> Input ：', $this -> Input);
+        $op -> Pay($InputModel);
 
 
-        $ConsumptionPoints  = $this -> BuildConsumptionPoints();
-
-        if($this -> HasError){
-            return  $this->SendJMsg();
+        if(0>= $op -> StatusCode){
+            return $this->SendJErr($op -> Title);
         }
-
-
-        $order -> UpdateTime = date('Y-m-d H:i:s');
-        // $order -> PayTime = date('Y-m-d H:i:s');
-        $order -> ClientName = $ClientName;
-        $order -> ClientPhone = $ClientPhone;
-        $order -> ClientAddress = $ClientAddress;
-        $order -> ClientRegionId = $ClientRegionId;
-
-        // 模拟支付成功
-        $order -> PayStatus = 20005000;
-        $order -> OrderStatus = 10005000;
-
-        if(null != $ConsumptionPoints){
-            $ConsumptionPoints -> save();
-        }
-
-
-        $CacheMng =  \app\Comm\SysSetCacheMng::getInstance();
-
-
-        // $dbuser =  new Client_UserT();
-        // $user = $dbuser -> where('Id',$order -> UserId) -> find();
-        // if($user == null){
-        //     return $this->SendJErr('用户不存在');
-        // }
-
 
 //        return $this->SendJErr('测试：拦截处理，提前返回',-1, $ExistUser);
 
-        $order -> save();
-        $ExistUser -> save();
-
-
-
-//        InfoLog('积分购买状态：' . $this-> IsPointBuy);
-        if(! $this -> IsPointBuy  && ! $this -> IsPreferredZone){
-            //生成积分
-//            $PointLog  =  [...$InputModel]; //展开运算符 7.4才支持
-//            $PointLog = $InputModel;//直接使用 =  克隆，但是语义不明显
-            $PointLog = array_merge($InputModel,[]); //展开运算符的替代品
-//            $this -> SayLog('日志模型数据 ：', $PointLog);
-            //$this->FillData4Log($PointLog);
-
-
-            $PointLog['Points'] = $order -> PayPrice * $CacheMng -> GetDecimal('ProductPointRatio',100) * 0.01;
-            $PointLog['AssetModeId'] =90007000;
-            $PointLog['AssetTypeId'] =80007000;
-            $PointLog['AssetStatusId'] =81002000;
-            $PointLog['AssetModeName'] ='销售积分';
-            $PointLog['AssetTypeName'] ='积分';
-            $PointLog['AssetStatusName'] ='等待&冻结';
-
-            $PointLog['IsFrozen'] =1;
-            $PointLog['ChangePoints'] = $PointLog['Points'];
-            $PointLog['Rmk']  .= "  为用户{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})变动积分[{$PointLog['Points']}]";
-            $PointLog['Rmk'] =mb_substr ( $PointLog['Rmk'] ,0,255, 'utf-8');
-
-
-            $DB4PointLog= new \app\Models\Client_PointLogT();
-            $this -> SayLog('积分操作： ' , $PointLog);
-
-            $DB4PointLog->save($PointLog);
-        }
-
-
-        //生成奖金
-
-        $BM  = BonusMng::getInstance();
-
-//        InfoLog('准备 生成奖金');
-        $poor =  $BM -> BuildPool4Id($OrderId,$UserId);
-        $this -> SayLog('奖金池处理： ' , $poor);
-
-        //生成见单奖
-
-
-
-
-
-        
-        $RegionId = $order -> ClientRegionId;
-        if( isset($RegionId) ||  !$this->IsPointBuy){
-            $RegionAgent = \app\Models\Biz_RegionAgentT::get($RegionId);
-            if(null != $RegionAgent &&  isset($RegionAgent) && ! empty($RegionAgent)  ){
-
-                $AreaMaster  = array_merge($InputModel,[]); //展开运算符的替代品
-
-                //            $AreaMaster['CreateTime'] = date('Y-m-d H:i:s');
-
-                $AreaMaster['AssetTypeId'] =80001000;
-                $AreaMaster['AssetTypeName'] ='现金';;
-                $AreaMaster['AssetStatusId'] =81002000;
-                $AreaMaster['AssetStatusName'] ='等待&冻结';
-                $AreaMaster['AssetModeId'] =90005000;
-                $AreaMaster['AssetModeName'] ='见单奖';
-                $AreaMaster['ClientRealName'] =  $RegionAgent-> RealityName;
-                $AreaMaster['ClientNickName'] =   $RegionAgent-> NickName;
-                $AreaMaster['ClientPhone'] =   $RegionAgent-> Mobile ;
-                $AreaMaster['ClientUserId'] = $RegionAgent -> ClientUserId;
-
-                $AreaMaster['Bonus'] = $order -> PayPrice * $CacheMng -> GetDecimal('AreaMasterCommissions',2) * 0.01;
-                $AreaMaster['ChangeBonus'] = $AreaMaster['Bonus'];
-
-                $AreaMaster['Rmk']  .= " 为用户{$RegionAgent -> ClientUserId}({$RegionAgent-> RealityName})生成《见单奖》[{$AreaMaster['Bonus']}] ，来源用户：{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})";
-                $AreaMaster['Rmk'] =mb_substr ( $AreaMaster['Rmk'] ,0,255, 'utf-8');
-
-
-                $DB4BonusLog= new \app\Models\Client_BonusLogT();
-                $this -> SayLog('见单奖： ' , $AreaMaster);
-                $DB4BonusLog->save($AreaMaster);
-
-            }
-
-
-
-
-        }
-
-
-
-
-
-
-
-
-
-
-        // 清空购物车
-        // $buycar = new Client_BuyCarItemT();
-        // $buycar -> where('UserId',$UserId) -> delete();
-
-        
         return $this->SendJOk('支付成功');
 
     }
@@ -500,7 +338,7 @@ class Order extends ApiBase
 
         $order -> save();
 
-        $dbuser =  new Client_UserT();
+        $dbuser =  new UserDB();
         $user = $dbuser -> where('Id',$order -> UserId) -> find();
         if($user == null){
             return $this->SendJErr('用户不存在');
@@ -527,74 +365,6 @@ class Order extends ApiBase
     }
 
 
-    /**
-     * 用户消费积分来支付订单，只是生成数据并没有保存
-     * @param $user
-     * @param $order
-     * @return \app\Models\Client_PointLogT
-     */
-    protected  function BuildConsumptionPoints( ){
-        $order =  $this -> CurrentOrder;
-        $user = $this -> CurrentUser;
-        if(0 < $order -> TotalPoint){
-            $this -> IsPointBuy = true;
-        }
-        else{
-            $this -> IsPointBuy = false;
-            return null;
-        }
-
-        if(null ==  $user -> PointsBalance  || 0 ==  $user -> PointsBalance){
-            $this -> _SetFail('用户没有积分不能支付积分消费的订单');
-            return  null;
-        }
-
-        if($user -> PointsBalance  < $order -> TotalPoint){
-            $this -> _SetFail('用户积分不足，无法完成交易');
-            return  null;
-        }
-        SetModel4Names($user,['PointsHistory', 'PointsBalance','PointsFrozen'],0);
-
-
-
-
-
-        $NewPoint =  new \app\Models\Client_PointLogT();
-
-        $this->FillData4Log($NewPoint);
-
-        $NewPoint -> Qty = $order -> TotalQty;
-        $NewPoint -> Points = $order -> TotalPoint;
-
-
-        $NewPoint -> ChangePoints = $order -> TotalPoint *-1;
-        $NewPoint -> OldPoints = $user -> PointsBalance;
-        $NewPoint -> NewPoints = $user -> PointsBalance + $NewPoint -> ChangePoints;
-
-        $NewPoint -> AssetModeId =90007500;
-        $NewPoint -> AssetModeName = '商城消费积分';
-        $NewPoint -> AssetTypeId =80007000;
-        $NewPoint -> AssetTypeName = '积分';
-        $NewPoint -> AssetStatusId =81002000;
-        $NewPoint -> AssetStatusName = '等待&冻结';
-
-
-
-        $NewPoint -> CreateTime = date('Y-m-d H:i:s');
-        $NewPoint -> IsFrozen = true;
-        $NewPoint -> IsSuccess = 1;
-        $NewPoint -> Rmk .= " 为用户{$this->CurrentUser->Id}({$this->CurrentUser->RealityName})变动积分[{$NewPoint -> ChangePoints}]";
-        $NewPoint -> Rmk =mb_substr ( $NewPoint -> Rmk,0,255, 'utf-8');
-
-        $user -> PointsBalance =  $NewPoint -> NewPoints;
-        $user -> PointsHistory += $NewPoint -> Points;
-        $user -> PointsFrozen += $NewPoint -> Points;
-//        $user -> Save();
-
-
-        return $NewPoint;
-
-    }
 
 
 
@@ -606,61 +376,9 @@ class Order extends ApiBase
         return $Rmk;
     }
 
-    protected  function FillData4Log($log)
-    {
-//        InfoLog('尝试诊断 日志 的问题 ：' .json_encode ($log)) ;
-        //$log  =  array_merge($log,$this -> Input );
-        FillArr2Model( $this -> Input,$log);
 
-//        $order =  $this -> CurrentOrder;
-//        $user = $this -> CurrentUser;
-//        $log -> ClientUserId = $order -> UserId;
-//        $log -> ClientRealName = $user -> RealityName;
-//        $log -> ClientNickName = $user -> NickName;
-//        $log -> ClientPhone = $user -> Mobile;
-//        $log -> OrderId = $order -> Id;
-//        $log -> OrderNo = $order -> OrderNo;
-    }
 
-    protected function GetIsPreferredZone($orderitem = null){
-        $Class =  null;
-        if(null == $orderitem){
 
-            $Class = $this -> CurrentProductClass;
-        }else{
-            $ClassId =  $orderitem -> ProductClassId;
-            $Class =  \app\Models\Product_ClassT::get($ClassId);
-            if($Class == null){
-                return false;
-            }
-        }
-
-        if(40002000 == $Class -> ProductZoneId){
-            return true;
-        }
-        return  false;
-
-    }
-
-    public function GetProductClass($orderitem  = null){
-
-        if(null  ==  $orderitem){
-            if(null ==  $this -> CurrentOrder  || null ==  $this -> CurrentOrder -> Items || 0 ==  count( $this -> CurrentOrder -> Items)){
-                throw new \Exception('数据错误找不到商品分类');
-            }
-            $orderitem =  $this -> CurrentOrder -> Items[0];
-        }
-
-        $ClassId =  $orderitem -> ProductClassId;
-        $Class =  \app\Models\Product_ClassT::get($ClassId);
-        if($Class == null){
-            throw new \Exception('数据错误找不到商品分类');
-            return false;
-        }
-
-        return   $Class;
-    }
-    protected  $IsPointBuy =  false;
 
 
 
@@ -718,7 +436,7 @@ class Order extends ApiBase
         if(2<= $level  ){
             return;
         }
-        $dbuser =  new Client_UserT();
+        $dbuser =  new UserDB();
         $cuser = $dbuser -> where('Id',$userid) -> find();
         if($cuser == null){
             return;
@@ -760,7 +478,7 @@ class Order extends ApiBase
         if(isset($guiderUserid) == false || $guiderUserid == null || $guiderUserid == ''){
             return;
         }
-        $dbuser =  new Client_UserT();
+        $dbuser =  new UserDB();
         $puser = $dbuser -> where('GuiderUserId',$guiderUserid) -> find();
         if($puser == null){
             return;
@@ -873,16 +591,372 @@ class Order extends ApiBase
     }
 
 
-    /**
-     * 保存新建的资源
-     *
-     * @param  \think\Request  $request
-     * @return \think\Response
+
+
+
+    /** 订单退款
+     * @return \think\response\Json|void
      */
-    public function save ($request)
-    {
-        //
+    public  function Refund(){
+        $OrderId = \think\facade\Request::param('OrderId',0);
+        $UserId =  \think\facade\Request::param('UserId',0);
+
+
+
+        if($OrderId == 0 || $UserId == 0){
+            return $this->SendJErr('参数错误');
+        }
+        $db =  new Client_OrderT();
+        $order = $db -> where(['Id'=>$OrderId,'UserId'=>$UserId]) -> find();
+        if($order == null){
+            return $this->SendJErr('订单不存在');
+        }
+        if($order -> OrderStatus != 10004000){
+            return $this->SendJErr('订单状态不正确，不能 确认收货 ' . $order -> OrderStatus);
+        }
+
+
+
+        //    'OrderStatus' => 10001000, //10001000 未完成 ;10005000 已经完成  etc.
+        //     'PayStatus' => 20001000, //20001000 未付款;20002000 付款中;20004000 已经取消;20005000 付款成功;20005500 退款;20009000 支付失败
+        //     'DeliveryStatus' => 70001000,//70001000 未发货;70002000 已发货;70004000 已到货;70005000 已签收;70006000 已取消
+        // 模拟支付成功
+        $ExistUser = UserDB::get($UserId);
+
+
+
+
+        $this -> OrderNow =  date('Y-m-d H:i:s');
+        $order -> OrderStatus = 10007000;
+        $order -> UpdateTime =$this -> OrderNow ;
+//        $order -> ArrivalTime = date('Y-m-d H:i:s');
+
+        $order -> Remark  .= "用户已经于[{$this -> OrderNow}]进行了退款";
+        $order -> Remark =mb_substr ( $order -> Remark  ,-1000,1000, 'utf-8');
+        $order -> Comment  .= "用户已经于[{$this -> OrderNow}]进行了退款";
+        $order -> Comment =mb_substr ( $order -> Remark  ,0,1000, 'utf-8');
+        $this -> CurrentOrder = $order;
+        $this -> CurrentUser = $ExistUser;
+
+        $order -> save();
+        $ExistUser -> save();
+        $this -> RefundOrderLogs();
+        return $this->SendJOk('订单退款');
+
+
     }
+
+
+    /** 处理订单退款相关 奖金、积分的记录
+     * @return void
+     */
+    protected  function RefundOrderLogs(){
+        $OrderId =  $this -> CurrentOrder -> Id;
+        $Now =$this -> OrderNow;
+        //处理现金
+        $LstCashBonus = Client_BonusLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80001000,
+            'AssetStatusId' => 81005000,
+        ]) -> select();
+        $BonusLogDb =  new Client_BonusLogT();
+
+        foreach ($LstCashBonus as $CashBonusLog){
+            $NewLog =   $CashBonusLog -> toArray();
+
+            $NewLog['Id'] = null;
+            $NewLog['UpdateTime'] = null;
+            $NewLog['CreateTime'] = $this -> OrderNow ; // 确保创建时间是当前时间
+            $NewLog['AssetModeId'] = 90006000;
+
+            $BonusUser =  Client_UserT::get($CashBonusLog -> ClientUserId );
+
+            SetModel4Names($BonusUser,['BonusBalance', 'BonusHistory','BonusFrozen'],0);
+
+            $OldBonus = $BonusUser -> BonusBalance;
+            $ChangeBonus =  $CashBonusLog -> Bonus;
+            $ChangeBonus =  abs($ChangeBonus ) * -1;
+            $NewBonus =  $OldBonus + $ChangeBonus;
+
+            $NewLog['OldBonus']  =  $OldBonus;
+            $NewLog['ChangeBonus']  =  $ChangeBonus;
+            $NewLog['NewBonus']  =  $NewBonus;
+
+
+            $BonusUser -> BonusBalance = $NewBonus;
+            $BonusUser -> Save();
+
+            $BonusLogDb -> save($NewLog);
+
+            $CashBonusLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了退款";
+            $CashBonusLog -> Rmk =mb_substr ( $CashBonusLog -> Rmk  ,-255,255, 'utf-8');
+            $CashBonusLog -> AssetStatusId =  81006000;
+            $CashBonusLog -> AssetStatusName =  '退款';
+
+            $CashBonusLog -> UpdateTime =  $this -> OrderNow;
+            $CashBonusLog -> save();
+        }
+        //处理金果
+        $LstScore = Client_BonusLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80002000,
+            'AssetStatusId' => 81005000,
+        ]) -> select();
+        $BonusLogDb =  new Client_BonusLogT();
+
+        foreach ($LstScore as $ScoreBonusLog){
+            $NewLog =   $ScoreBonusLog -> toArray();
+
+            $NewLog['Id'] = null;
+            $NewLog['UpdateTime'] = null;
+            $NewLog['CreateTime'] = $this -> OrderNow ; // 确保创建时间是当前时间
+            $NewLog['AssetModeId'] = 90006000;
+
+            $ScoreUser =  Client_UserT::get($ScoreBonusLog -> ClientUserId );
+
+            SetModel4Names($ScoreUser,['ScoreHistory', 'ScoreBalance','ScoreFrozen'],0);
+
+            $OldBonus = $ScoreUser -> ScoreBalance;
+            $ChangeBonus =  $ScoreBonusLog -> Bonus;
+            $ChangeBonus =  abs($ChangeBonus ) * -1;
+            $NewBonus =  $OldBonus + $ChangeBonus;
+
+            $NewLog['OldBonus']  =  $OldBonus;
+            $NewLog['ChangeBonus']  =  $ChangeBonus;
+            $NewLog['NewBonus']  =  $NewBonus;
+
+            $ScoreUser -> ScoreBalance = $NewBonus;
+            $ScoreUser -> Save();
+
+            $BonusLogDb -> save($NewLog);
+
+            $ScoreBonusLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了退款";
+            $ScoreBonusLog -> Rmk =mb_substr ( $ScoreBonusLog -> Rmk  ,-255,255, 'utf-8');
+            $ScoreBonusLog -> AssetStatusId =  81006000;
+            $ScoreBonusLog -> AssetStatusName =  '退款';
+
+            $ScoreBonusLog -> UpdateTime =  $this -> OrderNow;
+            $ScoreBonusLog -> save();
+        }
+
+        //处理积分
+        $LstPoint =  \app\Models\Client_PointLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80007000,
+            'AssetStatusId' => 81005000,
+        ]) -> select();
+        $PointLogDb =  new Client_PointLogT();
+
+        foreach ($LstPoint as $PointLog){
+            $NewLog =   $PointLog -> toArray();
+
+            $NewLog['Id'] = null;
+            $NewLog['UpdateTime'] = null;
+            $NewLog['CreateTime'] = $this -> OrderNow ; // 确保创建时间是当前时间
+            $NewLog['AssetModeId'] = 90006000;
+
+            $PointUser =  Client_UserT::get($PointLog -> ClientUserId );
+
+            SetModel4Names($PointUser,['PointsHistory', 'PointsBalance','PointsFrozen'],0);
+
+            $OldPoints = $PointUser -> PointsBalance;
+            $ChangePoints =  $PointLog -> Points;
+            $ChangePoints =  abs($ChangePoints ) * -1;
+            $NewPoints =  $OldPoints + $ChangePoints;
+
+            $NewLog['OldPoints']  =  $OldPoints;
+            $NewLog['ChangePoints']  =  $ChangePoints;
+            $NewLog['NewPoints']  =  $NewPoints;
+
+
+            $PointUser -> PointsBalance = $NewPoints;
+            $PointUser -> Save();
+
+            $PointLogDb -> save($NewLog);
+
+            $PointLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了退款";
+            $PointLog -> Rmk =mb_substr ( $PointLog -> Rmk  ,-255,255, 'utf-8');
+            $PointLog -> AssetStatusId =  81006000;
+            $PointLog -> AssetStatusName =  '退款';
+
+            $PointLog -> UpdateTime =  $this -> OrderNow;
+            $PointLog -> save();
+        }
+
+
+
+
+    }
+
+
+    /** 订单签收（送达）
+     * @return \think\response\Json
+     */
+    public  function Delivered(){
+
+        $OrderId = \think\facade\Request::param('OrderId',0);
+        $UserId =  \think\facade\Request::param('UserId',0);
+
+        $this -> OrderNow =  date('Y-m-d H:i:s');
+
+        if($OrderId == 0 || $UserId == 0){
+            return $this->SendJErr('参数错误');
+        }
+        $db =  new Client_OrderT();
+        $order = $db -> where(['Id'=>$OrderId,'UserId'=>$UserId]) -> find();
+        if($order == null){
+            return $this->SendJErr('订单不存在');
+        }
+        if($order -> OrderStatus != 10003000){
+            return $this->SendJErr('订单状态不正确，不能 确认收货 ' . $order -> OrderStatus);
+        }
+
+
+
+        //    'OrderStatus' => 10001000, //10001000 未完成 ;10005000 已经完成  etc.
+        //     'PayStatus' => 20001000, //20001000 未付款;20002000 付款中;20004000 已经取消;20005000 付款成功;20005500 退款;20009000 支付失败
+        //     'DeliveryStatus' => 70001000,//70001000 未发货;70002000 已发货;70004000 已到货;70005000 已签收;70006000 已取消
+        // 模拟支付成功
+        $ExistUser = UserDB::get($UserId);
+
+
+
+        $order -> OrderStatus = 10004000;
+        $order -> UpdateTime = $this -> OrderNow ;
+        $order -> ArrivalTime = $this -> OrderNow ;
+
+        $order -> Remark  .= "用户已经于[{$this -> OrderNow}]进行了签收";
+        $order -> Remark =mb_substr ( $order -> Remark  ,-1000,1000, 'utf-8');
+        $order -> Comment  .= "用户已经于[{$this -> OrderNow}]进行了签收";
+        $order -> Comment =mb_substr ( $order -> Remark  ,0,1000, 'utf-8');
+
+        $this -> CurrentOrder = $order;
+        $this -> CurrentUser = $ExistUser;
+
+        $order -> save();
+        $ExistUser -> save();
+        $this -> DeliveredOrderLogs();
+
+        return $this->SendJOk('确认收货');
+
+    }
+    /** 处理订单签收（送达）相关 奖金、积分的记录
+     * @return void
+     */
+    protected  function DeliveredOrderLogs(){
+        $OrderId =  $this -> CurrentOrder -> Id;
+        $Now =$this -> OrderNow;
+        //处理现金
+        $LstCashBonus = Client_BonusLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80001000,
+            'AssetStatusId' => 81002000,
+        ]) -> select();
+
+
+        foreach ($LstCashBonus as $CashBonusLog){
+
+            $BonusUser =  UserDB::get($CashBonusLog -> ClientUserId );
+
+            SetModel4Names($BonusUser,['BonusBalance', 'BonusHistory','BonusFrozen'],0);
+
+            $OldBonus = $BonusUser -> BonusBalance;
+            $ChangeBonus =  $CashBonusLog -> Bonus;
+            $NewBonus =  $OldBonus + $ChangeBonus;
+
+            $CashBonusLog['OldBonus']  =  $OldBonus;
+            $CashBonusLog['ChangeBonus']  =  $ChangeBonus;
+            $CashBonusLog['NewBonus']  =  $NewBonus;
+
+
+            $BonusUser -> BonusBalance = $NewBonus;
+            $BonusUser -> Save();
+
+
+
+            $CashBonusLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了签收";
+            $CashBonusLog -> Rmk =mb_substr ( $CashBonusLog -> Rmk  ,-255,255, 'utf-8');
+            $CashBonusLog -> AssetStatusId =  81005000;
+            $CashBonusLog -> AssetStatusName =  '成功';
+
+            $CashBonusLog -> UpdateTime =  $this -> OrderNow;
+            $CashBonusLog -> save();
+        }
+        //处理金果
+        $LstScore = Client_BonusLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80002000,
+            'AssetStatusId' => 81002000,
+        ]) -> select();
+
+        foreach ($LstScore as $ScoreBonusLog){
+
+            $ScoreUser =  UserDB::get($ScoreBonusLog -> ClientUserId );
+
+            SetModel4Names($ScoreUser,['ScoreHistory', 'ScoreBalance','ScoreFrozen'],0);
+
+            $OldBonus = $ScoreUser -> ScoreBalance;
+            $ChangeBonus =  $ScoreBonusLog -> Bonus;
+            $NewBonus =  $OldBonus + $ChangeBonus;
+
+
+            $ScoreBonusLog['OldBonus']  =  $OldBonus;
+            $ScoreBonusLog['ChangeBonus']  =  $ChangeBonus;
+            $ScoreBonusLog['NewBonus']  =  $NewBonus;
+
+            $ScoreUser -> ScoreBalance = $NewBonus;
+            $ScoreUser -> Save();
+
+
+            $ScoreBonusLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了签收";
+            $ScoreBonusLog -> Rmk =mb_substr ( $ScoreBonusLog -> Rmk  ,-255,255, 'utf-8');
+            $ScoreBonusLog -> AssetStatusId =  81005000;
+            $ScoreBonusLog -> AssetStatusName =  '成功';
+
+            $ScoreBonusLog -> UpdateTime =  $this -> OrderNow;
+            $ScoreBonusLog -> save();
+        }
+
+        //处理积分
+        $LstPoint =  \app\Models\Client_PointLogT:: where([
+            'OrderId'  => $OrderId,
+            'AssetTypeId' => 80007000,
+            'AssetStatusId' => 81002000,
+        ]) -> select();
+
+
+        foreach ($LstPoint as $PointLog){
+
+            $PointUser =  UserDB::get($PointLog -> ClientUserId );
+
+            SetModel4Names($PointUser,['PointsHistory', 'PointsBalance','PointsFrozen'],0);
+
+            $OldPoint = $PointUser -> PointsBalance;
+            $ChangePoint =  $PointLog -> Points;
+            $NewPoint =  $OldPoint + $ChangePoint;
+
+            $PointLog['OldPoints']  =  $OldPoint;
+            $PointLog['ChangePoints']  =  $ChangePoint;
+            $PointLog['NewPoints']  =  $NewPoint;
+
+
+            $PointUser -> PointsBalance = $NewPoint;
+            $PointUser -> Save();
+
+            $PointLog -> Rmk  .= "用户已经于[{$this -> OrderNow }]进行了签收";
+            $PointLog -> Rmk =mb_substr ( $PointLog -> Rmk  ,-255,255, 'utf-8');
+            $PointLog -> AssetStatusId =  81005000;
+            $PointLog -> AssetStatusName =  '成功';
+
+            $PointLog -> UpdateTime =  $this -> OrderNow;
+            $PointLog -> save();
+        }
+
+
+
+
+    }
+
 
     /**
      * 显示指定的资源

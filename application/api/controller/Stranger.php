@@ -58,14 +58,12 @@ class Stranger extends CommControllerBase
             'signName' =>  SysCfg::get('sms.aliyun_sms_templateid'),
             'templateCode' =>  SysCfg::get('sms.aliyun_sms_templatcode'),
         ];
+        $EnableDebug  = $this->_CacheMng ->GetInt('EnableDebug',0) == 1?true:false  ;
 
-//        if($EnableDebug){
-//
-//            $this -> Msg -> IsDebug =  true;
-//
-//            return $this-> SendJOk('短信发送成功' . $phone,20160119 ,[]);
-//
-//        }
+        if($EnableDebug){
+            $this -> Msg -> IsDebug =  true;
+            return $this-> SendJOk('短信发送成功' . $phone,20160119 ,[]);
+        }
         $Return =  SmsUtil::Send($phone,$NewCode,$AliConfig);
         $this -> SayLog('TestSms2 PhoneCheck Return:'.json_encode($Return));
         if('OK' == $Return -> code){
@@ -106,6 +104,9 @@ class Stranger extends CommControllerBase
 
 
         $Mobile = input('Mobile');
+        $Sex = input('Sex');
+        $Age = input('Age');
+
         $SmsMng = SmsCodeMng::getIns();
 
         $ExistCode = $SmsMng->GetCode($InputModel['Mobile']);
@@ -168,8 +169,11 @@ class Stranger extends CommControllerBase
         $InputModel['IsBindPhone'] = 1;
         $InputModel['Password'] = $Password;
         $InputModel['DbModel'] = $DbModel;
+        $InputModel['Age'] = $Age;
+        $InputModel['Sex'] = $Sex;
         $InputModel['NickName'] = $NickName;
         $InputModel['RealityName'] = $RealityName;
+        $InputModel['FaceImg'] = $this ->_MkFaceUrl($Sex);
 
         $InputModel['RegisterIp'] = $ip;
         $InputModel['RegisterDate'] = date('Y-m-d H:i:s');
@@ -259,6 +263,17 @@ class Stranger extends CommControllerBase
 
     }
 
+
+    protected function _MkFaceUrl($sex){
+        $SexName= 'boy';
+        if(2 ==  $sex) $SexName = 'girl';
+        $randomNumber = mt_rand(1, 3);
+
+        $Result =  "/images/FaceImg/{$SexName}{$randomNumber}.jpg";
+
+        return $Result;
+
+    }
 
 }
 

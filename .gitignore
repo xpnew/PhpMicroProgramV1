@@ -10,3 +10,4 @@ logs
 /src
 /git_init.bat
 uploads
+/config/sms.php
