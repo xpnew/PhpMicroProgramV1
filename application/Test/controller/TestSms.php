@@ -17,7 +17,7 @@ class TestSms extends CommControllerBase
 
         // 设置全局客户端
 // Please ensure that the environment variables ALIBABA_CLOUD_ACCESS_KEY_ID and ALIBABA_CLOUD_ACCESS_KEY_SECRET are set.
-AlibabaCloud::accessKeyClient('LTAI5tMTZWMejgVM3sdPKLaT','Qv2gtYY86V5oNGTqgtaEt2fYvbRqPv')
+AlibabaCloud::accessKeyClient('222','22')
 
 // use STS Token
 // AlibabaCloud::stsClient(getenv('ALIBABA_CLOUD_ACCESS_KEY_ID'), getenv('ALIBABA_CLOUD_ACCESS_KEY_SECRET'), getenv('ALIBABA_CLOUD_SECURITY_TOKEN'))

@@ -30,8 +30,8 @@ class TestSms2 extends CommControllerBase
         $credential = new Credential();
         $config = new Config([
            //"credential" => $credential
-            'accessKeyId' => 'LTAI5tMTZWMejgVM3sdPKLaT',
-    'accessKeySecret' => 'Qv2gtYY86V5oNGTqgtaEt2fYvbRqPv',
+            'accessKeyId' => '',
+    'accessKeySecret' => '',
         ]);
         // 配置协议类型为 HTTPS
 $config->protocol = "HTTPS";
